@@ -128,13 +128,63 @@ public class ManipulateCSV {
     }
 
 
+
+    public void Export_Execution_Results() throws IOException {
+        String csvFile = "./CSVs/Execution_Result.csv";
+        FileWriter writer = new FileWriter(csvFile);
+        writeLine(writer, Arrays.asList("a", "b", "c", "d"));
+    }
+
+
+    private static String followCVSformat(String value) {
+
+        String result = value;
+        if (result.contains("\"")) {
+            result = result.replace("\"", "\"\"");
+        }
+        return result;
+
+    }
+    public static void writeLine(Writer w, List<String> values) throws IOException {
+
+        boolean first = true;
+        char separators = ',';
+        char customQuote = ' ';
+
+        //default customQuote is empty
+        //if (separators == ' ') {
+        //    separators = ',';
+        //}
+
+        StringBuilder sb = new StringBuilder();
+        for (String value : values) {
+            if (!first) {
+                sb.append(separators);
+            }
+            if (customQuote == ' ') {
+                sb.append(followCVSformat(value));
+            } else {
+                sb.append(customQuote).append(followCVSformat(value)).append(customQuote);
+            }
+
+            first = false;
+        }
+        sb.append("\n");
+        w.append(sb.toString());
+
+
+    }
+
+
+
+
     /*
         Main function to list all CSV files read in console output.
         This method isn't used in the real job creation. This is just for debug purposes.
 
         Author: Fernanda Menks - Feb 20, 2017
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         List<String> tempCSVcontent = new ArrayList<String>();
         ManipulateCSV tempCSVfile = new ManipulateCSV();
 
@@ -152,7 +202,8 @@ public class ManipulateCSV {
             System.out.println(line);
         }
 
-
+        //3. Generate results CSV file
+        tempCSVfile.Export_Execution_Results();
     }
 }
 
