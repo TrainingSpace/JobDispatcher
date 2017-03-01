@@ -1,5 +1,3 @@
-import javaposse.jobdsl.dsl.views.ColumnsContext
-
 /**
  * Created by Fernanda.Menks on 2/26/2017.
  *
@@ -9,8 +7,10 @@ import javaposse.jobdsl.dsl.views.ColumnsContext
 
 
 List<String> IDs = new ArrayList<String>()
-TestCSV Recommended_Jobs = new TestCSV()
+ManipulateCSV Recommended_Jobs = new ManipulateCSV()
 IDs = Recommended_Jobs.ReadScriptIDs()
+
+
 
 
 String baseView = 'TCoE Job Dispatcher'

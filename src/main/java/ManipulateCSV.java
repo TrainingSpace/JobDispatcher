@@ -6,10 +6,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TestCSV {
+public class ManipulateCSV {
 
+
+    /*
+        Function to read CSV file with single column listing script IDs.
+        The 1st row in the CSV file is IGNORED as it corresponds to the header.
+        Sample:
+                Script ID
+                11
+                12
+                13
+                15
+
+        Author: Fernanda Menks - Feb 20, 2017
+     */
     public List<String> ReadScriptIDs(){
-        String csvFile = "./src/main/java/test.csv";
+        String csvFile = "./CSVs/JobIDs.csv";
         BufferedReader br = null;
         String line = "\n";
         String cvsSplitBy = ",";
@@ -26,9 +39,10 @@ public class TestCSV {
                 String [] temp = line.split(cvsSplitBy);
                 IDs.add(temp[0]);
 
-               // System.out.println("Script ID = " + line);
+                // In case need to display IDs while reading them...
+                //System.out.println("Script ID = " + line);
             }
-
+            // In case need to confirm that array was populated...
             //System.out.println("Total Scripts = " + IDs.size());
 
         } catch (FileNotFoundException e) {
@@ -50,15 +64,28 @@ public class TestCSV {
 
 
 
-    public static void main(String[] args) {
-        List<String> IDs = new ArrayList<String>();
-        TestCSV Recommended_Jobs = new TestCSV();
-        IDs = Recommended_Jobs.ReadScriptIDs();
 
-        System.out.println("Total Scripts = " + IDs.size());
-        for(String line : IDs){
+    /*
+        Main function to list all CSV files read in console output.
+        This method isn't used in the real job creation. This is just for debug purposes.
+
+        Author: Fernanda Menks - Feb 20, 2017
+     */
+    public static void main(String[] args) {
+        List<String> tempCSVcontent = new ArrayList<String>();
+        ManipulateCSV tempCSVfile = new ManipulateCSV();
+
+        //1. List input file with recommended job IDs
+        tempCSVcontent = tempCSVfile.ReadScriptIDs();
+
+        System.out.println("Total Scripts = " + tempCSVcontent.size());
+        for(String line : tempCSVcontent){
             System.out.println(line);
         }
+
+        //2. List input file with script IDs pending preset jobs in library
+
+        //3. List preset jobs library
     }
 }
 
