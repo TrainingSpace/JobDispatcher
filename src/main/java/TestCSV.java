@@ -8,7 +8,7 @@ import java.util.List;
 
 public class TestCSV {
 
-    public List<String> ScriptIDs(){
+    public List<String> ReadScriptIDs(){
         String csvFile = "./src/main/java/test.csv";
         BufferedReader br = null;
         String line = "\n";
@@ -53,7 +53,7 @@ public class TestCSV {
     public static void main(String[] args) {
         List<String> IDs = new ArrayList<String>();
         TestCSV Recommended_Jobs = new TestCSV();
-        IDs = Recommended_Jobs.ScriptIDs();
+        IDs = Recommended_Jobs.ReadScriptIDs();
 
         System.out.println("Total Scripts = " + IDs.size());
         for(String line : IDs){
