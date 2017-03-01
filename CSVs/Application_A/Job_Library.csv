@@ -1,0 +1,4 @@
+Script ID,Job Name,Application,Location,Auto Tool,ALM Domain,ALM Project,ALM Execution path,GitHub Feature file name,GitHub Repository URL
+11,,A,ALM,UFT,Domain_X,Project_A,Root\Folder\UFT test set,,
+13,,A,ALM,Worksoft,Domain_Y,Project_B,Root\Folder\Worksoft test set,,
+15,,A,GitHub,Selenium,,,,F15_WWWW.feature,https://github.com/Organization/Repository_BDD
