@@ -100,10 +100,10 @@ for(String line : IDs){
 } // end of loop
 
 
-job("$basePath_A/$folderLibrary/App_A_ALM_UFT_Script_11"){
+job("$basePath_A/$folderLibrary/App_A_ALM_dummy"){
 
 }
-job("$basePath_A/$folderLibrary/App_A_ALM_Worksoft_Script_13"){
+job("$basePath_A/$folderLibrary/App_A_ALM_another dummy"){
 
 }
 
@@ -116,4 +116,4 @@ job("$basePath_A/$folderLibrary/App_A_ALM_Worksoft_Script_13"){
 // 1.3. Create pipeline in execution folder
 // 1.4. Execute pipeline (job dispatcher)
 // 1.5. Generate result in CSV file
-    IDs = Recommended_Jobs.Export_Execution_Results()
+    //IDs = Recommended_Jobs.Export_Execution_Results()
