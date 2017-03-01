@@ -15,9 +15,9 @@ IDs = Recommended_Jobs.ReadScriptIDs()
 
 String baseView = 'TCoE Job Dispatcher'
 
-String basePath_A = 'Application A'
-String basePath_B = 'Application B'
-String basePath_C = 'Application C'
+String basePath_A = 'Application_A'
+String basePath_B = 'Application_B'
+String basePath_C = 'Application_C'
 
 String folderLibrary = 'Job Library'
 String folderExecution = 'Executions'

@@ -1,9 +1,9 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 
 public class ManipulateCSV {
@@ -62,7 +62,70 @@ public class ManipulateCSV {
     }
 
 
+    /*
+        Function to read CSV file from new auto scope and merge it into Job Library
+        Sample:
 
+            ****BEFORE****
+            * New Auto Scope CSV:
+               Script ID    Job Name                        Application     Location    Auto Tool   etc.
+               12                                           A               ALM         LeanFT
+               14                                           A               GitHub      Selenium
+
+            * Job Library CSV:
+               Script ID    Job Name                        Application     Location    Auto Tool   etc.
+               11           A_ALM_UFT_Script_11             A               ALM         UFT
+               13           A_ALM_Worksoft_Script_13        A               ALM         Worksoft
+               15           A_GitHub_Selenium_Script_15     A               GitHub      Selenium
+
+
+
+
+            ****AFTER****
+            * New Auto Scope CSV: <empty>
+               Script ID    Job Name                        Application     Location    Auto Tool   etc.
+
+            * Job Library CSV:
+               Script ID    Job Name                        Application     Location    Auto Tool   etc.
+               11           A_ALM_UFT_Script_11             A               ALM         UFT
+               12                                           A               ALM         LeanFT
+               13           A_ALM_Worksoft_Script_13        A               ALM         Worksoft
+               14                                           A               GitHub      Selenium
+               15           A_GitHub_Selenium_Script_15     A               GitHub      Selenium
+
+        Author: Fernanda Menks - Mar 1, 2017
+     */
+    public List<String> Merge_New_Auto_Scope_into_Library() {
+        List<Path> paths = Arrays.asList(Paths.get("./CSVs/Application_A/Job_Library.csv"), Paths.get("./CSVs/Application_A/New_Auto_Scope.csv"));
+        List<String> mergedLines = null;
+        try {
+            mergedLines = getMergedLines(paths);
+            Path target = Paths.get("./CSVs/Application_A/Job_Library.csv");
+            Files.write(target, mergedLines, Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return mergedLines;
+    }
+
+    private static List<String> getMergedLines(List<Path> paths) throws IOException {
+        List<String> mergedLines = null;
+        try {
+            mergedLines = new ArrayList<>();
+            for (Path p : paths) {
+                List<String> lines = Files.readAllLines(p, Charset.forName("UTF-8"));
+                if (!lines.isEmpty()) {
+                    if (mergedLines.isEmpty()) {
+                        mergedLines.add(lines.get(0)); //add header only once
+                    }
+                    mergedLines.addAll(lines.subList(1, lines.size()));
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return mergedLines;
+    }
 
 
     /*
@@ -77,15 +140,19 @@ public class ManipulateCSV {
 
         //1. List input file with recommended job IDs
         tempCSVcontent = tempCSVfile.ReadScriptIDs();
-
-        System.out.println("Total Scripts = " + tempCSVcontent.size());
+        System.out.println("Total Scripts in recommendation list = " + tempCSVcontent.size());
         for(String line : tempCSVcontent){
             System.out.println(line);
         }
 
-        //2. List input file with script IDs pending preset jobs in library
+        //2. Merge new auto scope into pre-set job library
+        tempCSVcontent = tempCSVfile.Merge_New_Auto_Scope_into_Library();
+        System.out.println("\n\nTotal jobs in library = " + tempCSVcontent.size());
+        for(String line : tempCSVcontent){
+            System.out.println(line);
+        }
 
-        //3. List preset jobs library
+
     }
 }
 
