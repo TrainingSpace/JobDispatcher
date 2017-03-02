@@ -1,7 +1,7 @@
 /**
  * Created by Fernanda.Menks on 2/26/2017.
  *
- * Sample Gradle execution string: rest  -Dpattern=jobs/JobDispatcher.groovy -DbaseUrl=http://fefezinha.com:8080/jenkins/ -Dusername=juliano -Dpassword=msdje123
+ * Sample Gradle execution string: rest  -Dpattern=jobs/TemplateJob.groovy -DbaseUrl=http://fefezinha.com:8080/jenkins/ -Dusername=juliano -Dpassword=msdje123
  */
 
 // **** SETUP JENKINS STRUCTURE ****
@@ -66,46 +66,43 @@ listView(baseView) {
 // **** LOAD JOB LIBRARY ****
 //1. Make sure that each recommended script has a job in the library
 // 1.1. Read all recommended jobs
-    List<String> IDs = new ArrayList<String>()
+    //List<String> IDs = new ArrayList<String>()
     ManipulateCSV Recommended_Jobs = new ManipulateCSV()
     IDs = Recommended_Jobs.ReadScriptIDs()
 
 // 1.2. Create pending jobs
 // For each script ID in the recommendation list...
-//     If there is no job... (2nd column in CSV is empty)
-//          1.2.1. Create job based on the location (4th column in CSV either ALM or GitHub)
-//          case ALM:
-//          case GitHub:
-//          1.2.2. Add job name into job library (2nd column in CSV)
-
-//For each script ID in the array, create a job that matches the ID number
 for(String line : IDs){
 
-    // Create jobs under folders
-    mavenJob("$basePath_A/$folderLibrary/App_A_GitHub_Selenium_Script_" + line) {
-        scm {
-            github('TrainingSpace/Training_BDD', 'master')
-        }
-        triggers {
-            githubPush()
-        }
-        rootPOM('pom.xml')
-        goals('clean verify')
-        publishers {
-            cucumberReports {
-                jsonReportPath('target')
-            }
-        }
-    }
+//     If there is no job... (2nd column in CSV is empty)
+//          a) Create job based on the location (4th column in CSV either ALM or GitHub)
+//          case ALM:
+                job("$basePath_A/$folderLibrary/App_A_ALM_dummy" + line){
+
+                }
+//          case GitHub:
+                mavenJob("$basePath_A/$folderLibrary/App_A_GitHub_Selenium_Script_" + line) {
+                    scm {
+                        github('TrainingSpace/Training_BDD', 'master')
+                    }
+                    triggers {
+                        githubPush()
+                    }
+                    rootPOM('pom.xml')
+                    goals('clean verify')
+                    publishers {
+                        cucumberReports {
+                            jsonReportPath('target')
+                        }
+                    }
+                }
+
+//          b) Add job name into job library (2nd column in CSV)
 } // end of loop
 
 
-job("$basePath_A/$folderLibrary/App_A_ALM_dummy"){
 
-}
-job("$basePath_A/$folderLibrary/App_A_ALM_another dummy"){
 
-}
 
 
 

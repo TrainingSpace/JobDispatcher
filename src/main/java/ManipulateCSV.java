@@ -8,6 +8,11 @@ import java.util.*;
 
 public class ManipulateCSV {
 
+    //***** GLOBAL VARIABLES ****
+    public static int iTotalJobIDs;    // Total job IDs in the recommendation file
+    public static int iExecutionRunID; // ID of the execution run currently in place
+    public static List<String> IDs = new ArrayList<String>(); // List of job IDs in the recommendation file
+
 
     /*
         Function to read CSV file with single column listing script IDs.
@@ -26,7 +31,6 @@ public class ManipulateCSV {
         BufferedReader br = null;
         String line = "\n";
         String cvsSplitBy = ",";
-        List<String> IDs = new ArrayList<String>();
 
         try {
             br = new BufferedReader(new FileReader(csvFile));
@@ -44,6 +48,9 @@ public class ManipulateCSV {
             }
             // In case need to confirm that array was populated...
             //System.out.println("Total Scripts = " + IDs.size());
+
+            //Populate global variable for total job IDs in the recommendation scope
+            iTotalJobIDs = IDs.size();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -98,6 +105,7 @@ public class ManipulateCSV {
     public List<String> Merge_New_Auto_Scope_into_Library() {
         List<Path> paths = Arrays.asList(Paths.get("./CSVs/Application_A/Job_Library.csv"), Paths.get("./CSVs/Application_A/New_Auto_Scope.csv"));
         List<String> mergedLines = null;
+
         try {
             mergedLines = getMergedLines(paths);
             Path target = Paths.get("./CSVs/Application_A/Job_Library.csv");
@@ -132,7 +140,21 @@ public class ManipulateCSV {
     public void Export_Execution_Results() throws IOException {
         String csvFile = "./CSVs/Execution_Result.csv";
         FileWriter writer = new FileWriter(csvFile);
-        writeLine(writer, Arrays.asList("a", "b", "c", "d"));
+        String ID = "";
+        String Exec_Status = "";
+
+        //Include header
+        writeLine(writer, Arrays.asList("Script ID", "Execution Status"));
+
+        //Include job ID + status
+        for(int i=0; i<iTotalJobIDs; i++){
+            ID = IDs.get(i);
+            Exec_Status = "Passed";      //<<<<<<<<<<<<<<<<<<<<<<<<<<<--------------- Call method to parse json file
+            writeLine(writer, Arrays.asList(ID, Exec_Status));
+        }
+
+        writer.flush();
+        writer.close();
     }
 
 
@@ -151,10 +173,6 @@ public class ManipulateCSV {
         char separators = ',';
         char customQuote = ' ';
 
-        //default customQuote is empty
-        //if (separators == ' ') {
-        //    separators = ',';
-        //}
 
         StringBuilder sb = new StringBuilder();
         for (String value : values) {
@@ -189,21 +207,23 @@ public class ManipulateCSV {
         ManipulateCSV tempCSVfile = new ManipulateCSV();
 
         //1. List input file with recommended job IDs
-        tempCSVcontent = tempCSVfile.ReadScriptIDs();
-        System.out.println("Total Scripts in recommendation list = " + tempCSVcontent.size());
-        for(String line : tempCSVcontent){
-            System.out.println(line);
+        tempCSVfile.ReadScriptIDs();
+        System.out.println("Total Scripts in recommendation list = " + iTotalJobIDs);
+        for(int i=0; i<iTotalJobIDs; i++){
+            System.out.println(i+1 + ") "+ IDs.get(i));
         }
 
-        //2. Merge new auto scope into pre-set job library
+
+       /* //2. Merge new auto scope into pre-set job library
         tempCSVcontent = tempCSVfile.Merge_New_Auto_Scope_into_Library();
         System.out.println("\n\nTotal jobs in library = " + tempCSVcontent.size());
         for(String line : tempCSVcontent){
             System.out.println(line);
         }
-
+*/
         //3. Generate results CSV file
         tempCSVfile.Export_Execution_Results();
+
     }
 }
 
