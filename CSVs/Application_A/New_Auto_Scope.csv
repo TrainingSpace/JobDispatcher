@@ -1,3 +1,0 @@
-Script ID,Job Name,Application,Location,Auto Tool,ALM Domain,ALM Project,ALM Execution path,GitHub Feature file name,GitHub Repository URL
-12,,A,ALM,LeanFT,Domain_X,Project_B,Root\Folder\LeanFT test set,,
-14,,A,GitHub,Selenium,,,,F14_ZZZZ.feature,https://github.com/Organization/Repository_BDD

@@ -65,23 +65,44 @@ listView(baseView) {
 
 // **** LOAD JOB LIBRARY ****
 //1. Make sure that each recommended script has a job in the library
-// 1.1. Read all recommended jobs
-    //List<String> IDs = new ArrayList<String>()
+// 1.1. Merge new jobs into library
     ManipulateCSV Recommended_Jobs = new ManipulateCSV()
+    Recommended_Jobs.Merge_New_Auto_Scope_into_Library()
+
+// 1.2. Read all recommended jobs
     IDs = Recommended_Jobs.ReadScriptIDs()
+    JobLibrary = Recommended_Jobs.ReadJobLibrary(basePath_A) //create jobs for 1st app only. Update this in the future
 
-// 1.2. Create pending jobs
-// For each script ID in the recommendation list...
-for(String line : IDs){
+// 1.3. Create pending jobs
+    // For each script ID in the recommendation list...
+    for(String line : IDs){
+        job("$basePath_A/$folderLibrary/script " + line){
 
-//     If there is no job... (2nd column in CSV is empty)
-//          a) Create job based on the location (4th column in CSV either ALM or GitHub)
-//          case ALM:
-                job("$basePath_A/$folderLibrary/App_A_ALM_dummy" + line){
+        }
+    }
+    for(int i=0; i< JobLibrary.size(); i++){
+        tempJob = JobLibrary.get(i);
+        job("$basePath_A/$folderLibrary/object script " + tempJob.Script_ID){
+
+        }
+    }
+
+/*    //for(String line : IDs){
+        for (Job tempJob: JobLibrary) {
+
+            //     If there is no job yet...
+            //if (tempJob.Job_Name.isEmpty()){
+
+                tempJob.Job_Name = "$tempJob.Application/$folderLibrary/$tempJob.Application"+"_$tempJob.Location"+"_$tempJob.Auto_Tool"+"_Script_" + tempJob.Script_ID
+
+                //a) Create job based on the location (TODAY it's either ALM or GitHub)
+                //   case ALM:
+                job(tempJob.Job_Name) {
 
                 }
-//          case GitHub:
-                mavenJob("$basePath_A/$folderLibrary/App_A_GitHub_Selenium_Script_" + line) {
+                //   case GitHub:
+                //mavenJob(tempJob.Job_Name) {
+                mavenJob(tempJob.Job_Name) {
                     scm {
                         github('TrainingSpace/Training_BDD', 'master')
                     }
@@ -97,10 +118,13 @@ for(String line : IDs){
                     }
                 }
 
-//          b) Add job name into job library (2nd column in CSV)
-} // end of loop
+                //          b) Add job name into job library (2nd column in CSV)
 
+           // }// end of condition if there's no job created yet
+        }
+   // } // end of loop
 
+*/
 
 
 
@@ -110,7 +134,10 @@ for(String line : IDs){
 
 
 //**** JOB DISPATCHER ****
-// 1.3. Create pipeline in execution folder
-// 1.4. Execute pipeline (job dispatcher)
-// 1.5. Generate result in CSV file
+// 2. Create pipeline to dispatch recommended jobs
+// 2.1. Create pipeline in execution folder
+// 2.2. Execute pipeline (job dispatcher)
+
+// 3. Export execution result to be analyzed by Recommendation engine
+//    Generate result in CSV file
     IDs = Recommended_Jobs.Export_Execution_Results()

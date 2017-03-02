@@ -6,12 +6,14 @@ import java.nio.file.Paths;
 import java.util.*;
 
 
+
 public class ManipulateCSV {
 
     //***** GLOBAL VARIABLES ****
     public static int iTotalJobIDs;    // Total job IDs in the recommendation file
     public static int iExecutionRunID; // ID of the execution run currently in place
     public static List<String> IDs = new ArrayList<String>(); // List of job IDs in the recommendation file
+    public static List<Job> JobLibrary = new ArrayList<Job>(); // List of jobs listed in the library for a particular application
 
 
     /*
@@ -69,6 +71,99 @@ public class ManipulateCSV {
     }
 
 
+
+    /*
+    Function to read CSV file with single column listing script IDs.
+
+    Sample:   Job Library
+       Script ID    Job Name                        Application     Location    Auto Tool   etc.
+       11           A_ALM_UFT_Script_11             A               ALM         UFT
+       13           A_ALM_Worksoft_Script_13        A               ALM         Worksoft
+       15           A_GitHub_Selenium_Script_15     A               GitHub      Selenium
+
+    Author: Fernanda Menks - Mar 2, 2017
+ */
+    public List<Job> ReadJobLibrary(String ApplicationFolder){
+        String csvFile = "./CSVs/"+ ApplicationFolder +"/Job_Library.csv";
+        BufferedReader br = null;
+        String line = "\n";
+        String cvsSplitBy = ",";
+        Job tempJob = new Job();
+        int temp_Script_ID;
+        String temp_Job_Name;
+        String temp_Application;
+        String temp_Location;
+        String temp_Auto_Tool;
+        String temp_ALM_Domain;
+        String temp_ALM_Project;
+        String temp_ALM_Execution_Path;
+        String temp_GitHub_Feature;
+        String temp_GitHub_Repository_URL;
+
+        try {
+            br = new BufferedReader(new FileReader(csvFile));
+            // Ignore header line from CSV file
+            br.readLine();
+
+            // Add all script IDs into array 'ScriptIDs'
+            while ((line = br.readLine()) != null) {
+
+                String [] temp = line.split(cvsSplitBy);
+                temp_Script_ID = Integer.parseInt(temp[0]);
+                temp_Job_Name = temp[1];
+                temp_Application = temp[2];
+                temp_Location = temp[3];
+                temp_Auto_Tool = temp[4];
+                temp_ALM_Domain = temp[5];
+                temp_ALM_Project = temp[6];
+                temp_ALM_Execution_Path = temp[7];
+                if (temp.length > 8){
+                    temp_GitHub_Feature = temp[8];
+                    temp_GitHub_Repository_URL = temp[9];
+                }else{
+                    temp_GitHub_Feature = "";
+                    temp_GitHub_Repository_URL = "";
+                }
+                tempJob.addJob(temp_Script_ID, temp_Job_Name, temp_Application, temp_Location, temp_Auto_Tool
+                             , temp_ALM_Domain, temp_ALM_Project, temp_ALM_Execution_Path, temp_GitHub_Feature
+                            , temp_GitHub_Repository_URL);
+                JobLibrary.add(tempJob);
+            }//end of loop
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return JobLibrary;
+    }
+
+
+
+    /*
+        Function to return the Job object from JobLibrary list based on the script ID
+        Author: Fernanda Menks, March 2, 2017
+     */
+    /*public Job getJob(int pScript_ID){
+        Job tempJob = new Job();
+        for(int i=0; i<iTotalJobIDs; i++){
+            tempJob = JobLibrary.get(i);
+            if (tempJob.Script_ID = pScript_ID){
+               break;
+            }
+        }
+        return tempJob;
+    }
+*/
+
     /*
         Function to read CSV file from new auto scope and merge it into Job Library
         Sample:
@@ -107,9 +202,16 @@ public class ManipulateCSV {
         List<String> mergedLines = null;
 
         try {
+            // Merge
             mergedLines = getMergedLines(paths);
             Path target = Paths.get("./CSVs/Application_A/Job_Library.csv");
             Files.write(target, mergedLines, Charset.forName("UTF-8"));
+
+            // Clean new auto scope file
+            FileWriter writer = new FileWriter("./CSVs/Application_A/New_Auto_Scope.csv", false);
+            writer.write(""); // input empty data
+            writer.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -214,13 +316,17 @@ public class ManipulateCSV {
         }
 
 
-       /* //2. Merge new auto scope into pre-set job library
+        //2. Merge new auto scope into pre-set job library
         tempCSVcontent = tempCSVfile.Merge_New_Auto_Scope_into_Library();
-        System.out.println("\n\nTotal jobs in library = " + tempCSVcontent.size());
+        System.out.println("\n\nTotal lines in Job Library CSV file = " + tempCSVcontent.size());
         for(String line : tempCSVcontent){
             System.out.println(line);
         }
-*/
+
+        tempCSVfile.ReadJobLibrary("Application_A");
+        System.out.println("\n\nTotal jobs objects in library = " + JobLibrary.size());
+        //tempCSVfile.getJob(13);
+
         //3. Generate results CSV file
         tempCSVfile.Export_Execution_Results();
 
