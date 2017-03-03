@@ -13,7 +13,7 @@ public class ManipulateCSV {
     public static int iTotalJobIDs;    // Total job IDs in the recommendation file
     public static int iExecutionRunID; // ID of the execution run currently in place
     public static List<String> IDs = new ArrayList<String>(); // List of job IDs in the recommendation file
-    public static List<Job> JobLibrary = new ArrayList<Job>(); // List of jobs listed in the library for a particular application
+    public static List<JobContainer> JobLibrary = new ArrayList<>(); // List of jobs listed in the library for a particular application
 
 
     /*
@@ -83,12 +83,12 @@ public class ManipulateCSV {
 
     Author: Fernanda Menks - Mar 2, 2017
  */
-    public List<Job> ReadJobLibrary(String ApplicationFolder){
+    public List<JobContainer> ReadJobLibrary(String ApplicationFolder){
         String csvFile = "./CSVs/"+ ApplicationFolder +"/Job_Library.csv";
         BufferedReader br = null;
         String line = "\n";
         String cvsSplitBy = ",";
-        Job tempJob = new Job();
+        JobContainer tempJob;
         int temp_Script_ID;
         String temp_Job_Name;
         String temp_Application;
@@ -124,7 +124,7 @@ public class ManipulateCSV {
                     temp_GitHub_Feature = "";
                     temp_GitHub_Repository_URL = "";
                 }
-                tempJob.addJob(temp_Script_ID, temp_Job_Name, temp_Application, temp_Location, temp_Auto_Tool
+                tempJob = new JobContainer(temp_Script_ID, temp_Job_Name, temp_Application, temp_Location, temp_Auto_Tool
                              , temp_ALM_Domain, temp_ALM_Project, temp_ALM_Execution_Path, temp_GitHub_Feature
                             , temp_GitHub_Repository_URL);
                 JobLibrary.add(tempJob);

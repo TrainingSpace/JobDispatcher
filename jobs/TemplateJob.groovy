@@ -81,9 +81,9 @@ listView(baseView) {
         }
     }
     for(int i=0; i< JobLibrary.size(); i++){
-        tempJob = JobLibrary.get(i);
+        tempJob = JobLibrary.get(i)
+        //System.out.println(">>>>>>>>> posicao: "+ i +" id: " + tempJob.Script_ID)
         job("$basePath_A/$folderLibrary/object script " + tempJob.Script_ID){
-
         }
     }
 
