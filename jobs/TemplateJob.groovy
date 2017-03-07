@@ -70,7 +70,7 @@ listView(baseView) {
 // **** LOAD JOB LIBRARY ****
 //1. Make sure that each recommended script has a job in the library
 // 1.1. Merge new jobs into library
-    ManipulateCSV Recommended_Jobs = new ManipulateCSV()
+    JobDispatcherClass Recommended_Jobs = new JobDispatcherClass()
     Recommended_Jobs.Merge_New_Auto_Scope_into_Library()
 
 // 1.2. Read all recommended jobs
@@ -94,8 +94,9 @@ listView(baseView) {
             switch (tempJob.Location){
             //   case ALM:
                 case "ALM":
-                    job(tempJob.Job_Name) {
-                    }
+                    Create_ALM_Job(tempJob)
+                    //job(tempJob.Job_Name) {
+                    //}
                     break
 
             //   case GitHub:

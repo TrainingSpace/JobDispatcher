@@ -4,7 +4,7 @@
 
 public class JobContainer{
 
-    private int Script_ID;
+    int Script_ID;
     String Job_Name;
     String Application;
     String Location;

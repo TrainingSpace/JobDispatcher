@@ -7,7 +7,7 @@ import java.util.*;
 
 
 
-public class ManipulateCSV {
+public class JobDispatcherClass {
 
     //***** GLOBAL VARIABLES ****
     public static int iTotalJobIDs;    // Total job IDs in the recommendation file
@@ -16,9 +16,10 @@ public class ManipulateCSV {
     public static List<JobContainer> JobLibrary = new ArrayList<>(); // List of jobs listed in the library for a particular application
 
     //ALM specific config info
-    public static String ALM_Server_Name; // ALM server name listed in Jenkins server configuration
-    public static String ALM_Username;    // ALM user who can connect into ALM project where the job is located
-    public static String ALM_Password;    // ALM user password to connect into ALM project to execute auto scripts
+    public static String ALM_Server_Name = "ALM_Server_Name_From_Jenkins_Config"; // ALM server name listed in Jenkins server configuration
+    public static String ALM_Username    = "coelf003";    // ALM user who can connect into ALM project where the job is located
+    public static String ALM_Password    = "{AQAAABAAAAAQ6zNBkrfEAu5SrK6+XEp/BbzVuWj5myeHT3J/b1NkoZg=}";    // ALM user password to connect into ALM project to execute auto scripts
+
 
 
     /*
@@ -296,7 +297,69 @@ public class ManipulateCSV {
         }
         sb.append("\n");
         w.append(sb.toString());
+    }
 
+
+    /*
+    Method to
+ */
+    public static void Create_ALM_Job(JobContainer tempJob) throws IOException {
+        if (tempJob.Job_Name.isEmpty()){
+            tempJob.Job_Name = tempJob.Application + "_" + tempJob.Location + "_" + tempJob.Auto_Tool + "_Script_" + tempJob.Script_ID;
+        }
+
+        String csvFile = "./build/"+tempJob.Job_Name+".xml";
+        FileWriter writer = new FileWriter(csvFile);
+
+        writer.write("<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<project>\n" +
+                "  <actions/>\n" +
+                "  <description>"+"Pre-set job item for ALM script ID "+tempJob.Script_ID+" | Auto tool = "+tempJob.Auto_Tool+"</description>\n" +
+                "  <keepDependencies>false</keepDependencies>\n"+
+                "<properties/>\n" +
+                "  <scm class=\"hudson.scm.NullSCM\"/>\n" +
+                "  <canRoam>true</canRoam>\n" +
+                "  <disabled>false</disabled>\n" +
+                "  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>\n" +
+                "  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>\n" +
+                "  <triggers/>\n" +
+                "  <concurrentBuild>false</concurrentBuild>\n" +
+                "  <builders>\n" +
+                "    <com.hp.application.automation.tools.run.RunFromAlmBuilder plugin=\"hp-application-automation-tools-plugin@5.1\">\n" +
+                "      <runFromAlmModel>\n" +
+                "        <almServerName>"+ALM_Server_Name+"</almServerName>\n" +
+                "        <almUserName>"+ALM_Username+"</almUserName>\n" +
+                "        <almPassword>"+ALM_Password+"</almPassword>\n" +
+                "        <almDomain>"+tempJob.ALM_Domain+"</almDomain>\n" +
+                "        <almProject>"+tempJob.ALM_Project+"</almProject>\n" +
+                "        <almTestSets>"+tempJob.ALM_Execution_Path+"</almTestSets>\n" +
+                "        <almTimeout></almTimeout>\n" +
+                "        <almRunMode>RUN_LOCAL</almRunMode>\n" +
+                "        <almRunHost></almRunHost>\n" +
+                "      </runFromAlmModel>\n" +
+                "      <ResultFilename>ApiResults.xml</ResultFilename>\n" +
+                "      <ParamFileName>ApiRun.txt</ParamFileName>\n" +
+                "    </com.hp.application.automation.tools.run.RunFromAlmBuilder>\n" +
+                "  </builders>\n" +
+                "  <publishers>\n" +
+                "    <com.hp.application.automation.tools.results.RunResultRecorder plugin=\"hp-application-automation-tools-plugin@5.1\">\n" +
+                "      <__resultsPublisherModel>\n" +
+                "        <archiveTestResultsMode>ALWAYS_ARCHIVE_TEST_REPORT</archiveTestResultsMode>\n" +
+                "      </__resultsPublisherModel>\n" +
+                "    </com.hp.application.automation.tools.results.RunResultRecorder>\n" +
+                "  </publishers>\n" +
+                "  <buildWrappers>\n" +
+                "    <hudson.plugins.build__timeout.BuildTimeoutWrapper plugin=\"build-timeout@1.18\">\n" +
+                "      <strategy class=\"hudson.plugins.build_timeout.impl.LikelyStuckTimeOutStrategy\"/>\n" +
+                "      <operationList>\n" +
+                "        <hudson.plugins.build__timeout.operations.AbortOperation/>\n" +
+                "      </operationList>\n" +
+                "    </hudson.plugins.build__timeout.BuildTimeoutWrapper>\n" +
+                "  </buildWrappers>\n" +
+                "</project>");
+
+        writer.flush();
+        writer.close();
 
     }
 
@@ -311,7 +374,8 @@ public class ManipulateCSV {
      */
     public static void main(String[] args) throws IOException {
         List<String> tempCSVcontent = new ArrayList<String>();
-        ManipulateCSV tempCSVfile = new ManipulateCSV();
+        JobDispatcherClass tempCSVfile = new JobDispatcherClass();
+        JobContainer tempJob;
 
         //1. List input file with recommended job IDs
         tempCSVfile.ReadScriptIDs();
@@ -334,6 +398,10 @@ public class ManipulateCSV {
 
         //3. Generate results CSV file
         tempCSVfile.Export_Execution_Results();
+
+        //4. Confirm that
+        tempJob = JobLibrary.get(0);
+        Create_ALM_Job(tempJob);
 
     }
 }
