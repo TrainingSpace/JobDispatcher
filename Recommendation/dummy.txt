@@ -1,0 +1,4 @@
+Wish list of working items:
+
+March 6, 2017 - Fernanda Menks
+    - Read ALM config info from web page setup

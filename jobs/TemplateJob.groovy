@@ -2,9 +2,13 @@
  * Created by Fernanda.Menks on 2/26/2017.
  *
  * Sample Gradle execution string: rest  -Dpattern=jobs/TemplateJob.groovy -DbaseUrl=http://fefezinha.com:8080/jenkins/ -Dusername=juliano -Dpassword=msdje123
+ * Documentation for job DSL plugin: https://jenkinsci.github.io/job-dsl-plugin/#path/job
  */
 
 // **** SETUP JENKINS STRUCTURE ****
+//Setup global parameter for ALM
+ALM_Server_Name = 'PRD'
+
 //Create list view and folder structure
 String baseView = 'TCoE Job Dispatcher'
 
@@ -74,55 +78,57 @@ listView(baseView) {
     JobLibrary = Recommended_Jobs.ReadJobLibrary(basePath_A) //create jobs for 1st app only. Update this in the future
 
 // 1.3. Create pending jobs
+    // For each job in the job library...
+    for(int i=0; i< JobLibrary.size(); i++){
+
+        tempJob = JobLibrary.get(i)
+
+        //     If there is no job yet...
+        if (tempJob.Job_Name.isEmpty()) {
+            //a) Create job name
+            tempJob.Job_Name = "$tempJob.Application/$folderLibrary/$tempJob.Application" + "_$tempJob.Location" + "_$tempJob.Auto_Tool" + "_Script_" + tempJob.Script_ID
+
+            //b) Add job name into job library (2nd column in CSV)
+
+            //c) Create job based on the location (TODAY it's either ALM or GitHub)
+            switch (tempJob.Location){
+            //   case ALM:
+                case "ALM":
+                    job(tempJob.Job_Name) {
+                    }
+                    break
+
+            //   case GitHub:
+                case "GitHub":
+                    mavenJob(tempJob.Job_Name) {
+                        scm {
+                            //github('TrainingSpace/Training_BDD', 'master')
+                            github("$tempJob.GitHub_Repository_URL", 'master')
+                        }
+                        triggers {
+                            githubPush()
+                        }
+                        rootPOM('pom.xml')
+                        goals('clean verify')
+                        publishers {
+                            cucumberReports {
+                                jsonReportPath('target')
+                            }
+                        }
+                    }
+                    break
+            }// end of switch
+
+        }// end of condition if job name is empty
+    }// end of loop for all jobs in library
+
+/*
     // For each script ID in the recommendation list...
     for(String line : IDs){
         job("$basePath_A/$folderLibrary/script " + line){
 
         }
     }
-    for(int i=0; i< JobLibrary.size(); i++){
-        tempJob = JobLibrary.get(i)
-        //System.out.println(">>>>>>>>> posicao: "+ i +" id: " + tempJob.Script_ID)
-        job("$basePath_A/$folderLibrary/object script " + tempJob.Script_ID){
-        }
-    }
-
-/*    //for(String line : IDs){
-        for (Job tempJob: JobLibrary) {
-
-            //     If there is no job yet...
-            //if (tempJob.Job_Name.isEmpty()){
-
-                tempJob.Job_Name = "$tempJob.Application/$folderLibrary/$tempJob.Application"+"_$tempJob.Location"+"_$tempJob.Auto_Tool"+"_Script_" + tempJob.Script_ID
-
-                //a) Create job based on the location (TODAY it's either ALM or GitHub)
-                //   case ALM:
-                job(tempJob.Job_Name) {
-
-                }
-                //   case GitHub:
-                //mavenJob(tempJob.Job_Name) {
-                mavenJob(tempJob.Job_Name) {
-                    scm {
-                        github('TrainingSpace/Training_BDD', 'master')
-                    }
-                    triggers {
-                        githubPush()
-                    }
-                    rootPOM('pom.xml')
-                    goals('clean verify')
-                    publishers {
-                        cucumberReports {
-                            jsonReportPath('target')
-                        }
-                    }
-                }
-
-                //          b) Add job name into job library (2nd column in CSV)
-
-           // }// end of condition if there's no job created yet
-        }
-   // } // end of loop
 
 */
 

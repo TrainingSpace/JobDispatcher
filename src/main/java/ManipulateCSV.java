@@ -15,6 +15,11 @@ public class ManipulateCSV {
     public static List<String> IDs = new ArrayList<String>(); // List of job IDs in the recommendation file
     public static List<JobContainer> JobLibrary = new ArrayList<>(); // List of jobs listed in the library for a particular application
 
+    //ALM specific config info
+    public static String ALM_Server_Name; // ALM server name listed in Jenkins server configuration
+    public static String ALM_Username;    // ALM user who can connect into ALM project where the job is located
+    public static String ALM_Password;    // ALM user password to connect into ALM project to execute auto scripts
+
 
     /*
         Function to read CSV file with single column listing script IDs.
