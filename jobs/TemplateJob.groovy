@@ -95,8 +95,6 @@ listView(baseView) {
             //   case ALM:
                 case "ALM":
                     Create_ALM_Job(tempJob)
-                    //job(tempJob.Job_Name) {
-                    //}
                     break
 
             //   case GitHub:

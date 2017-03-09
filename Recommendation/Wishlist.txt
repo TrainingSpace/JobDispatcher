@@ -1,0 +1,8 @@
+Wish list of working items:
+
+Job Dispatcher:
+    - Read ALM config info from web page setup  [March 6, 2017 - Fernanda Menks]
+
+Recommendation:
+    - Implement dynamic cutover date and threshold limitations in the answer [March 9, 2017 - Fernanda Menks]
+
