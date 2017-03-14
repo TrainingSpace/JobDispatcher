@@ -40,6 +40,17 @@ public class JenkinsCLIWrapper {
         }
     }
 
+    public void CreateGroovyFile(String content, String fileName) {
+        try {
+            PrintWriter groovyFile = new PrintWriter(fileName);
+            groovyFile.println(content);
+            groovyFile.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     /**
      * Creates a xml template of the provided job
      *
@@ -82,9 +93,19 @@ public class JenkinsCLIWrapper {
         RunCommand(sCommand);
     }
 
+    public void CreateView(String viewName) {
+        String groovyContent = "hudson.model.Hudson.instance.addView(new hudson.model.ListView(\"" + viewName + "\"))";
+        CreateGroovyFile(groovyContent, "createView.groovy");
+        sCommand = sCommand + " groovy createView.groovy";
+        System.out.println(sCommand);
+        System.out.println("Groovy: " + groovyContent);
+        RunCommand(sCommand);
+    }
+
     public static void main(String args[]) {
         JenkinsCLIWrapper jenks = new JenkinsCLIWrapper("http://fefezinha.com:8080/jenkins");
-        //jenks.CreateJob("TesteCLI","teste.xml");
+        jenks.CreateView("Oi Fefe");
+        //jenks.CreateJob("BLABLABLA","teste.xml");
         //jenks.BuildJob("TesteCLI");
         //jenks.DisableJob("TesteCLI");
         //jenks.EnableJob("TesteCLI");
