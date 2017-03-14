@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>add description here...</description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>10.0.0.1</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <com.hp.application.automation.tools.run.RunFromAlmBuilder plugin="hp-application-automation-tools-plugin@5.0">
+      <runFromAlmModel>
+        <almServerName>my Client ALM</almServerName>
+        <almUserName>coelf003</almUserName>
+        <almPassword>{AQAAABAAAAAQGIG9lTxyPGI1Q4yo6AfpXSl9Wv8W+sLU9CeSxlSFrqI=}</almPassword>
+        <almDomain>ALM_DOMAIN</almDomain>
+        <almProject>ALM_PROJECT</almProject>
+        <almTestSets>Root/ALM_Folder/Test_Set_Name
+</almTestSets>
+        <almTimeout></almTimeout>
+        <almRunMode>RUN_LOCAL</almRunMode>
+        <almRunHost></almRunHost>
+      </runFromAlmModel>
+      <ResultFilename>ApiResults.xml</ResultFilename>
+      <ParamFileName>ApiRun.txt</ParamFileName>
+    </com.hp.application.automation.tools.run.RunFromAlmBuilder>
+  </builders>
+  <publishers>
+    <com.hp.application.automation.tools.results.RunResultRecorder plugin="hp-application-automation-tools-plugin@5.0">
+      <__resultsPublisherModel>
+        <archiveTestResultsMode>ALWAYS_ARCHIVE_TEST_REPORT</archiveTestResultsMode>
+      </__resultsPublisherModel>
+    </com.hp.application.automation.tools.results.RunResultRecorder>
+  </publishers>
+  <buildWrappers/>
+</project>

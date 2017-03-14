@@ -86,7 +86,7 @@ listView(baseView) {
         //     If there is no job yet...
         if (tempJob.Job_Name.isEmpty()) {
             //a) Create job name
-            tempJob.Job_Name = "$tempJob.Application/$folderLibrary/$tempJob.Application" + "_$tempJob.Location" + "_$tempJob.Auto_Tool" + "_Script_" + tempJob.Script_ID
+            tempJob.Job_Name = "$tempJob.Application" + "_Script_" + tempJob.Script_ID + "_$tempJob.Location" + "_$tempJob.Auto_Tool"
 
             //b) Add job name into job library (2nd column in CSV)
 
@@ -99,7 +99,7 @@ listView(baseView) {
 
             //   case GitHub:
                 case "GitHub":
-                    mavenJob(tempJob.Job_Name) {
+                    mavenJob("$tempJob.Application/$folderLibrary/"+tempJob.Job_Name) {
                         scm {
                             //github('TrainingSpace/Training_BDD', 'master')
                             github("$tempJob.GitHub_Repository_URL", 'master')
@@ -145,4 +145,4 @@ listView(baseView) {
 
 // 3. Export execution result to be analyzed by Recommendation engine
 //    Generate result in CSV file
-    IDs = Recommended_Jobs.Export_Execution_Results()
+    IDs = Recommended_Jobs.Export_Execution_Results(basePath_A)
