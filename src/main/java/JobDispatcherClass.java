@@ -243,8 +243,34 @@ public class JobDispatcherClass {
         return mergedLines;
     }
 
+    /*
+    Function to update CSV file with the Job name
+        Sample:
+
+            ****BEFORE****
+            * Job Library CSV:
+               Script ID    Job Name                        Application     Location    Auto Tool   etc.
+               11                                           A               ALM         UFT
+               13                                           A               ALM         Worksoft
+               15                                           A               GitHub      Selenium
+
+            ****AFTER****
+               Script ID    Job Name                        Application     Location    Auto Tool   etc.
+               11           A_ALM_UFT_Script_11             A               ALM         UFT
+               13           A_ALM_Worksoft_Script_13        A               ALM         Worksoft
+               15           A_GitHub_Selenium_Script_15     A               GitHub      Selenium
+
+        Author: Shahzad Rizvi - Mar 13, 2017
+     */
+   /* public List<String> Update_CSV(String ApplicationFolder, String Data){
+        String csvFile = "./CSVs/"+ ApplicationFolder +"/Job_Library.csv";
+        List<String> updatedLines = null;
 
 
+
+        return updatedLines;
+    }
+    */
     public void Export_Execution_Results() throws IOException {
         String csvFile = "./CSVs/Execution_Result.csv";
         FileWriter writer = new FileWriter(csvFile);
