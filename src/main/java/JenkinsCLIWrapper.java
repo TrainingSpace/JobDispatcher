@@ -40,15 +40,26 @@ public class JenkinsCLIWrapper {
         }
     }
 
-    public void CreateGroovyFile(String content, String fileName) {
+    private void CreateGroovyFile(String content, String fileName) {
         try {
             PrintWriter groovyFile = new PrintWriter(fileName);
             groovyFile.println(content);
             groovyFile.close();
+            System.out.println("Created file: " + fileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
+    }
+
+    private void DeleteGroovyFile(String fileName) {
+        try {
+            File groovyFile = new File(fileName);
+            groovyFile.delete();
+            System.out.println("Deleted file: " + fileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -95,11 +106,12 @@ public class JenkinsCLIWrapper {
 
     public void CreateView(String viewName) {
         String groovyContent = "hudson.model.Hudson.instance.addView(new hudson.model.ListView(\"" + viewName + "\"))";
+        System.out.println("Groovy: " + groovyContent);
         CreateGroovyFile(groovyContent, "createView.groovy");
         sCommand = sCommand + " groovy createView.groovy";
         System.out.println(sCommand);
-        System.out.println("Groovy: " + groovyContent);
         RunCommand(sCommand);
+        DeleteGroovyFile("createView.groovy");
     }
 
     public static void main(String args[]) {
