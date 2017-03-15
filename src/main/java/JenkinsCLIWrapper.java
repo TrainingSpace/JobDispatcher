@@ -72,36 +72,42 @@ public class JenkinsCLIWrapper {
         sCommand = sCommand + " get-job \"" + jobName + "\" > \"" + destinationXML + "\"";
         System.out.println(sCommand);
         RunCommand(sCommand);
+        System.out.println("Done.");
     }
 
     public void CreateJob(String jobName, String sourceXML) {
         sCommand = sCommand + " create-job \"" + jobName + "\" < \"" + sourceXML + "\"";
         System.out.println(sCommand);
         RunCommand(sCommand);
+        System.out.println("Done.");
     }
 
     public void DeleteJob(String jobName) {
         sCommand = sCommand + " delete-job \"" + jobName + "\"";
         System.out.println(sCommand);
         RunCommand(sCommand);
+        System.out.println("Done.");
     }
 
     public void BuildJob(String jobName) {
         sCommand = sCommand + " build \"" + jobName + "\"";
         System.out.println(sCommand);
         RunCommand(sCommand);
+        System.out.println("Done.");
     }
 
     public void DisableJob(String jobName) {
         sCommand = sCommand + " disable-job \"" + jobName + "\"";
         System.out.println(sCommand);
         RunCommand(sCommand);
+        System.out.println("Done.");
     }
 
     public void EnableJob(String jobName) {
         sCommand = sCommand + " enable-job \"" + jobName + "\"";
         System.out.println(sCommand);
         RunCommand(sCommand);
+        System.out.println("Done.");
     }
 
     public void CreateView(String viewName) {
@@ -112,17 +118,46 @@ public class JenkinsCLIWrapper {
         System.out.println(sCommand);
         RunCommand(sCommand);
         DeleteGroovyFile("createView.groovy");
+        System.out.println("Done.");
     }
+
+    public void DeleteView(String viewName) {
+        System.out.println("Deleting view "+ viewName +"...");
+        sCommand = sCommand + " delete-view \"" + viewName + "\"";
+        System.out.println(sCommand);
+        RunCommand(sCommand);
+        System.out.println("Done.");
+    }
+
+    public void CreateFolder(String folderName) {
+        System.out.println("Creating folder "+ folderName +"...");
+        sCommand = sCommand + " create-job \"" + folderName + "\" < empty_folder.xml";
+        System.out.println(sCommand);
+        RunCommand(sCommand);
+        System.out.println("Done.");
+    }
+
+    public void DeleteFolder(String folderName) {
+        System.out.println("Deleting folder "+ folderName +"...");
+        sCommand = sCommand + " delete-job \"" + folderName + "\"";
+        System.out.println(sCommand);
+        RunCommand(sCommand);
+        System.out.println("Done.");
+    }
+
 
     public static void main(String args[]) {
         JenkinsCLIWrapper jenks = new JenkinsCLIWrapper("http://fefezinha.com:8080/jenkins");
-        jenks.CreateView("Oi Fefe");
         //jenks.CreateJob("BLABLABLA","teste.xml");
         //jenks.BuildJob("TesteCLI");
         //jenks.DisableJob("TesteCLI");
         //jenks.EnableJob("TesteCLI");
         //jenks.GetJob("TesteCLI","testeCLI.xml");
         //jenks.DeleteJob("TesteCLI");
+        //jenks.CreateView("Oi Fefe");
+        //jenks.DeleteView("Oi Fefe");
+        jenks.CreateFolder("Oi Fefe folder");
+        //jenks.DeleteFolder("Oi Fefe folder");
     }
 
 }
