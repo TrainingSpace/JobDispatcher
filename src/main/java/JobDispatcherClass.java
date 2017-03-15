@@ -4,7 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 
 public class JobDispatcherClass {
@@ -394,6 +395,48 @@ public class JobDispatcherClass {
         jenks.CreateJob("SetupJenkinsStructure","./Template XML/Template_SetupJenkinsStructure.xml");
         jenks.EnableJob("SetupJenkinsStructure");
         jenks.BuildJob("SetupJenkinsStructure");
+    }
+
+/*
+    Function to update CSV file with the Job name
+        Sample:
+
+            ****BEFORE****
+            * Job Library CSV:
+               Script ID    Job Name                        Application     Location    Auto Tool   etc.
+               11                                           A               ALM         UFT
+               13                                           A               ALM         Worksoft
+               15                                           A               GitHub      Selenium
+
+            ****AFTER****
+               Script ID    Job Name                        Application     Location    Auto Tool   etc.
+               11           A_ALM_UFT_Script_11             A               ALM         UFT
+               13           A_ALM_Worksoft_Script_13        A               ALM         Worksoft
+               15           A_GitHub_Selenium_Script_15     A               GitHub      Selenium
+
+            Can be used as:
+                Update_CSV("sampleApplication","SampleData", 1, 1)
+        Author: Shahzad Rizvi - Mar 13, 2017
+     */
+
+    public static String Update_CSV(String sApplicationFolder, String sData, Integer iColumn, Integer iRow) throws IOException{
+        //String csvFile = "./CSVs/"+ sApplicationFolder +"/Job_Library.csv";
+        String csvFile = "./Job_Library.csv";
+        String output = "./Job_Library2.csv";
+        List<String> updatedLines = null;
+        String[] sLine;
+        CSVReader reader = new CSVReader(new FileReader(csvFile));
+        List<String[]> csvBody = reader.readAll();
+
+        csvBody.get(iRow)[iColumn] = sData;
+        reader.close();
+
+        CSVWriter writer = new CSVWriter(new FileWriter(output));
+        writer.writeAll(csvBody);
+        writer.flush();
+        writer.close();
+
+        return output;
     }
 
 
