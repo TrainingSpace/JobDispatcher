@@ -48,7 +48,11 @@ node {
         
         parallel buildExecutions
    }
-    
+   
+   stage('Publish to ALM'){
+      build job: 'ALMPublisher', parameters: [[$class: 'StringParameterValue', name: 'buildWorkspace', value:
+                                               "${WORKSPACE}"], [$class: 'StringParameterValue', name:'resultFilePattern', value: "**/target/surefire-reports/TEST-*.xml"]]
+   }
    
    stage('Results') {
       junit '**/target/surefire-reports/TEST-*.xml'
