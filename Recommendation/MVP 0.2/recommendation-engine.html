@@ -43,25 +43,13 @@
 
 
 <body>
-   <font face="calibri">
-	<h2>TCoE Recommendation Engine</h2>
+	<!--<h2>TCoE Recommendation Engine</h2>-->
 	
 	<div>
-		<img src="TestOpsEngineLogo.png" style="width: 50%; height: 50%"/>
+		<img src="TestOpsEngineLogo.png" />
 	</div>
-
-
-	<!--App Options-->
-	<br><br>
-	<select id="application">
-		<option value="default">What application are we discussing today?</option>
-		<option value="app1">SAP</option>
-		<option value="app2">OPA</option>
-		<option value="app3">WTP</option>
-		<option value="app4">Demo App</option>
-	</select>
-	<br><br>
-
+	<hr />
+	
 	<!--Options-->
 	<select id="questions">
 		  <option value="default">Select an option?</option>
@@ -78,7 +66,7 @@
 	<div id="ReqsContainer" class="clearfix">
 		<div style="font-weight: bold;"> Upload Requirements:</div>
 		<input type="file" id="reqfiles" name="reqfiles[]" multiple />
-		<br><br>
+		<hr />
 	</div>	
 	
 		
@@ -86,46 +74,47 @@
 	<div id="scriptsContainer" class="clearfix">
 		<div style="font-weight: bold;"> Upload Scripts:</div>
 		<input type="file" id="scriptfiles" name="scriptfiles[]" multiple />
-		<br><br>
+		<hr />
 	</div>	
 	
 	<!-- Execution List Data -->	
 	<div id="execContainer" class="clearfix">
 		<div style="font-weight: bold;"> Upload Execution List:</div>
 		<input type="file" id="executionfiles" name="executionfiles[]" multiple />
-		<br><br>
+		<hr />
 	</div>
 		
 	<!-- defects List Data -->		
 	<div id="defectsContainer" class="clearfix">
 		<div style="font-weight: bold;"> Upload Defects List:</div>
 		<input type="file" id="defectfiles" name="defectfiles[]" multiple />
-		<br><br>
+		<hr />
 	</div>
-
+	
+	
 	<!-- Merge Data -->
 	<!--<div style="font-weight: bold; margin-bottom: 20px;"> Execute:</div>
 	<input type="button" id="exportCsv" value="Export Csv" />-->
 	
 	<div id="exportScriptsIdData">
-		<p>Date: <input type="text" id="datepicker">
-		   Threshold %: <input type="text" name="threshold" id="threshold" value="">
-		<br>
+		<a href="#" class="exportScriptsIdData">Export Scripts Table data into Excel</a><br /><br />
+		<a href="#" class="downloadJobListData">Download Final Job List Ids</a>
 		<hr />
-		<a href="#" class="exportScriptsIdData">Export Scripts Table data into Excel</a>
-		
 	</div>
 	
 	<!-- Results Data -->
 	<div id="answersContainer">
+		<p>Cut-over Date: <input type="text" id="datepicker">
+		Threshold %: <input type="text" name="threshold" id="threshold" value="">
+		</p>	
 		Click here to view the <a href="#" class="answers">recommendation</a>		
 		<hr />
 	</div>
 	<!--<button value="Answer" id="anwsers">Answers</button>-->
 	<div id="resultContainer">
 	</div>
-
-
-   </font>
+	
+	
+	
 </body>
 </html>

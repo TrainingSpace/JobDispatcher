@@ -21,12 +21,15 @@ $(document).ready(function(){
 		$('#scriptfiles').val(''); 
 		$('#executionfiles').val('');
 		$('#resultContainer').empty();
+		$('#ReqsContainer').hide();
+		$('#scriptsContainer').hide();
+		$('#execContainer').hide();
+		$('#defectsContainer').hide();
+		$('#exportScriptsIdData').hide();
+		$('#answersContainer').hide();
 		//alert('question selected === ' + $("#questions option:selected").text() );
 		
 		if (questionsVal == 'q1') {				
-			/*$('#reqfiles').val(''); 
-			$('#scriptfiles').val(''); 
-			$('#resultContainer').empty();*/
 			$('#ReqsContainer').show();
 			$('#scriptsContainer').show();
 			$('#exportScriptsIdData').show();				
@@ -150,7 +153,7 @@ $(document).ready(function(){
 								
 			}
 		
-			//alert('Req Ids with current month =' + finalReqIds);
+			alert('Req Ids with current month =' + finalReqIds);
 		
 		}
 		
@@ -223,7 +226,8 @@ $(document).ready(function(){
 			
 			finalScriptIds = finalScriptHeadr + '\n' + finalScriptIds;
 		
-			//alert('Final Script Ids === ' + '\n' + finalScriptIds);						
+			alert('Final Script Ids === ' + '\n' + finalScriptIds);		
+			$('#jobTable').html(html);	
 		
 		};
 	  reader.onerror = function(){ alert('Unable to read ' + orgScriptsCsvFile.fileName); };
@@ -280,7 +284,7 @@ $(document).ready(function(){
 			}	
 			
 			q2JobList = q2JobListHeader + q2JobList;				
-			//alert(q2JobList);	
+			alert(q2JobList);	
 			
 		}						
 	}
@@ -298,7 +302,7 @@ $(document).ready(function(){
 		} else if (questionsVal == 'q1') {	
 			getNewReqsId(orgReqFile);
 			getNewFeaturesJobIds(orgScriptsCsvFile);	
-			$('#answersContainer').show();			
+			$('#answersContainer').show();	
 			
 		} else if (questionsVal == 'q2') {				
 			getNewReqsId(orgReqFile);
@@ -313,15 +317,32 @@ $(document).ready(function(){
 		} 		
 	});
 	
+	$(".downloadJobListData").on('click', function(event) {
+		if (questionsVal == ''){
+			alert('Please select an option from the questions dropdown');
+			
+		} else if (questionsVal == 'q1') {	
+			var args = [finalScriptIds, 'JobIDs.csv'];			
+			exportScriptIdsToCSV.apply(this, args);
+			
+		} else if (questionsVal == 'q2') {				
+			var args = [q2JobList, 'JobIDs.csv'];			
+			exportScriptIdsToCSV.apply(this, args);
+			
+		} else if (questionsVal == 'q3') {				
+			var args = [finalScriptIds, 'JobIDs.csv'];			
+			exportScriptIdsToCSV.apply(this, args);
+			
+		} 		
+			
+	});
+	
 	$(".answers").on('click', function(event) {
 		if (questionsVal == 'q1') {	
-			var args = [finalScriptIds, 'JobIDs.csv'];
-			exportScriptIdsToCSV.apply(this, args);	
 			var rows = finalScriptIds.split("\n");
 			var scriptCount = rows.length - 1;
 			//alert('No: of scripts executed = ' + scriptCount);	
 			
-			//var result = 'Yes all ' + scriptCount + ' scripts executed in ' + currentMonth + ' were successfully executed as of ' + currentDate;
 			result = 'Total No: of script executed = 5 <br>';
 			result += '% passed = 60% <br>';
 			result += '% failed = 40% <br>';
@@ -330,13 +351,10 @@ $(document).ready(function(){
 			$( "#resultContainer" ).append( result );
 			$('#resultContainer').show();
 		} else if (questionsVal == 'q2') {				
-			/*var args = [q2JobList, 'JobIDs.csv'];
-			exportScriptIdsToCSV.apply(this, args);	*/
 			var rows = finalScriptIds.split("\n");
 			var scriptCount = rows.length - 1;
 			//alert('No: of scripts executed = ' + scriptCount);	
 			
-			//var result = 'Yes all ' + scriptCount + ' scripts executed in ' + currentMonth + ' were successfully executed as of ' + currentDate;
 			var result = 'Total No: of script executed = 5 <br>';
 			result += '% passed = 40% <br>';
 			result += '% failed = 60% <br>';
@@ -354,17 +372,8 @@ $(document).ready(function(){
 		var scriptCount = rows.length - 1;
 		//alert('No: of scripts executed = ' + scriptCount);	
 		
-		//var result = 'Yes all ' + scriptCount + ' scripts executed in ' + currentMonth + ' were successfully executed as of ' + currentDate;
-		var result = 'Total No: of script executed = ' + scriptCount + '<br>';
-		result += '% passed = 60% <br>';
-		result += '% failed = 40% <br>';
-		result += 'Recommendation: YES';
-		
-		$( "#resultContainer" ).append( result );
-		$('#resultContainer').show();
-
 		// Deliberate 'false', see comment below
-		/*if (false && window.navigator.msSaveBlob) {
+		if (false && window.navigator.msSaveBlob) {
 
 		  var blob = new Blob([decodeURIComponent(finalScriptIds)], {
 			type: 'text/csv;charset=utf8'
@@ -399,7 +408,7 @@ $(document).ready(function(){
 			  'href': finalScriptsCsvData,
 			  'target': '_blank'
 			});
-		}*/
+		}
 	}
 			
 });
