@@ -243,7 +243,7 @@ public class JobDispatcherClass {
         return mergedLines;
     }
 
-    /*
+     /*
     Function to update CSV file with the Job name
         Sample:
 
@@ -260,17 +260,30 @@ public class JobDispatcherClass {
                13           A_ALM_Worksoft_Script_13        A               ALM         Worksoft
                15           A_GitHub_Selenium_Script_15     A               GitHub      Selenium
 
+            Can be used as:
+                Update_CSV("sampleApplication","SampleData", 1, 1)
         Author: Shahzad Rizvi - Mar 13, 2017
      */
-   /* public List<String> Update_CSV(String ApplicationFolder, String Data){
-        String csvFile = "./CSVs/"+ ApplicationFolder +"/Job_Library.csv";
+
+    public static String Update_CSV(String sApplicationFolder, String sData, Integer iColumn, Integer iRow) throws IOException{
+        //String csvFile = "./CSVs/"+ sApplicationFolder +"/Job_Library.csv";
+        String csvFile = "./Job_Library.csv";
+        String output = "./Job_Library2.csv";
         List<String> updatedLines = null;
+        String[] sLine;
+        CSVReader reader = new CSVReader(new FileReader(csvFile));
+        List<String[]> csvBody = reader.readAll();
 
+        csvBody.get(iRow)[iColumn] = sData;
+        reader.close();
 
+        CSVWriter writer = new CSVWriter(new FileWriter(output));
+        writer.writeAll(csvBody);
+        writer.flush();
+        writer.close();
 
-        return updatedLines;
+        return output;
     }
-    */
     public void Export_Execution_Results() throws IOException {
         String csvFile = "./CSVs/Execution_Result.csv";
         FileWriter writer = new FileWriter(csvFile);
