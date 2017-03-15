@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <javaposse.jobdsl.plugin.ExecuteDslScripts plugin="job-dsl@1.58">
+      <scriptText>String baseView = &apos;TCoE Job Dispatcher&apos;
+
+String basePath_A = &apos;Application_A&apos;
+String basePath_B = &apos;Application_B&apos;
+String basePath_C = &apos;Application_C&apos;
+
+String folderLibrary = &apos;Job Library&apos;
+String folderExecution = &apos;Executions&apos;
+
+
+
+//Create folders per application
+folder(basePath_A) {
+    description &apos;Scripts to validate Application A&apos;
+}
+folder(&quot;$basePath_A/$folderLibrary&quot;){}
+folder(&quot;$basePath_A/$folderExecution&quot;){}
+
+folder(basePath_B) {
+    description &apos;Scripts to validate Application B&apos;
+}
+folder(&quot;$basePath_B/$folderLibrary&quot;){}
+folder(&quot;$basePath_B/$folderExecution&quot;){}
+
+folder(basePath_C) {
+    description &apos;Scripts to validate Application C&apos;
+}
+folder(&quot;$basePath_C/$folderLibrary&quot;){}
+folder(&quot;$basePath_C/$folderExecution&quot;){}
+
+
+//Setup view including all folders per application
+listView(baseView) {
+    description(&apos;Job Dispatcher view for all applications in TCoE.&apos;
+            +&apos;\n\nEach application structure Includes:&apos;
+            +&quot;\n        App &gt; $folderLibrary -- includes ALL jobs for each single script available in this app&quot;
+            +&quot;\n        App &gt; $folderExecution -- host executions for each recommendation execution request&quot;
+            +&apos;\n\n&apos;)
+
+    //Config view
+    jobs{
+        name(&quot;$basePath_A&quot;)
+        name(&quot;$basePath_B&quot;)
+        name(&quot;$basePath_C&quot;)
+    }
+    columns{
+        status()
+        name()
+    }
+}</scriptText>
+      <usingScriptText>true</usingScriptText>
+      <ignoreExisting>false</ignoreExisting>
+      <ignoreMissingFiles>false</ignoreMissingFiles>
+      <failOnMissingPlugin>false</failOnMissingPlugin>
+      <unstableOnDeprecation>false</unstableOnDeprecation>
+      <removedJobAction>IGNORE</removedJobAction>
+      <removedViewAction>IGNORE</removedViewAction>
+      <lookupStrategy>JENKINS_ROOT</lookupStrategy>
+    </javaposse.jobdsl.plugin.ExecuteDslScripts>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

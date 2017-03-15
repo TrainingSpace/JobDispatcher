@@ -4,8 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
+
+
 
 public class JobDispatcherClass {
 
@@ -14,6 +14,7 @@ public class JobDispatcherClass {
     public static int iExecutionRunID; // ID of the execution run currently in place
     public static List<String> IDs = new ArrayList<String>(); // List of job IDs in the recommendation file
     public static List<JobContainer> JobLibrary = new ArrayList<>(); // List of jobs listed in the library for a particular application
+    public static String Jenkins_URL = "http://localhost:8080/";
 
     //ALM specific config info
     public static String ALM_Server_Name = "ALM_Server_Name_From_Jenkins_Config"; // ALM server name listed in Jenkins server configuration
@@ -34,8 +35,8 @@ public class JobDispatcherClass {
 
         Author: Fernanda Menks - Feb 20, 2017
      */
-    public List<String> ReadScriptIDs(){
-        String csvFile = "./CSVs/JobIDs.csv";
+    public List<String> ReadScriptIDs(String ApplicationFolder){
+        String csvFile = "./CSVs/"+ApplicationFolder+"/JobIDs.csv";
         BufferedReader br = null;
         String line = "\n";
         String cvsSplitBy = ",";
@@ -79,13 +80,12 @@ public class JobDispatcherClass {
 
 
     /*
-    Function to read CSV file with single column listing script IDs.
-
+    Function to read all jobs from existent library in a particular application folder.
     Sample:   Job Library
-       Script ID    Job Name                        Application     Location    Auto Tool   etc.
-       11           A_ALM_UFT_Script_11             A               ALM         UFT
-       13           A_ALM_Worksoft_Script_13        A               ALM         Worksoft
-       15           A_GitHub_Selenium_Script_15     A               GitHub      Selenium
+       Script ID    Job Name                                    Application     Location    Auto Tool   etc.
+       11           Application_A_Script_11_ALM_UFT             Application_A   ALM         UFT
+       13           Application_A_Script_13_ALM_Worksoft        Application_A   ALM         Worksoft
+       15           Application_A_Script_15_GitHub_Selenium     Application_A   GitHub      Selenium
 
     Author: Fernanda Menks - Mar 2, 2017
  */
@@ -158,7 +158,7 @@ public class JobDispatcherClass {
         Function to return the Job object from JobLibrary list based on the script ID
         Author: Fernanda Menks, March 2, 2017
      */
-    /*public Job getJob(int pScript_ID){
+/*public Job getJob(int pScript_ID){
         Job tempJob = new Job();
         for(int i=0; i<iTotalJobIDs; i++){
             tempJob = JobLibrary.get(i);
@@ -176,15 +176,15 @@ public class JobDispatcherClass {
 
             ****BEFORE****
             * New Auto Scope CSV:
-               Script ID    Job Name                        Application     Location    Auto Tool   etc.
-               12                                           A               ALM         LeanFT
-               14                                           A               GitHub      Selenium
+               Script ID    Job Name                                    Application     Location    Auto Tool   etc.
+               12                                                       Application_A   ALM         LeanFT
+               14                                                       Application_A   GitHub      Selenium
 
             * Job Library CSV:
-               Script ID    Job Name                        Application     Location    Auto Tool   etc.
-               11           A_ALM_UFT_Script_11             A               ALM         UFT
-               13           A_ALM_Worksoft_Script_13        A               ALM         Worksoft
-               15           A_GitHub_Selenium_Script_15     A               GitHub      Selenium
+               Script ID    Job Name                                    Application     Location    Auto Tool   etc.
+               11           Application_A_Script_11_ALM_UFT             Application_A   ALM         UFT
+               13           Application_A_Script_13_ALM_Worksoft        Application_A   ALM         Worksoft
+               15           Application_A_Script_15_GitHub_Selenium     Application_A   GitHub      Selenium
 
 
 
@@ -194,27 +194,27 @@ public class JobDispatcherClass {
                Script ID    Job Name                        Application     Location    Auto Tool   etc.
 
             * Job Library CSV:
-               Script ID    Job Name                        Application     Location    Auto Tool   etc.
-               11           A_ALM_UFT_Script_11             A               ALM         UFT
-               12                                           A               ALM         LeanFT
-               13           A_ALM_Worksoft_Script_13        A               ALM         Worksoft
-               14                                           A               GitHub      Selenium
-               15           A_GitHub_Selenium_Script_15     A               GitHub      Selenium
+               Script ID    Job Name                                    Application     Location    Auto Tool   etc.
+               11           Application_A_Script_11_ALM_UFT             Application_A   ALM         UFT
+               13           Application_A_Script_13_ALM_Worksoft        Application_A   ALM         Worksoft
+               15           Application_A_Script_15_GitHub_Selenium     Application_A   GitHub      Selenium
+               12                                                       Application_A   ALM         LeanFT
+               14                                                       Application_A   GitHub      Selenium
 
         Author: Fernanda Menks - Mar 1, 2017
      */
-    public List<String> Merge_New_Auto_Scope_into_Library() {
-        List<Path> paths = Arrays.asList(Paths.get("./CSVs/Application_A/Job_Library.csv"), Paths.get("./CSVs/Application_A/New_Auto_Scope.csv"));
+    public List<String> Merge_New_Auto_Scope_into_Library(String ApplicationFolder) {
+        List<Path> paths = Arrays.asList(Paths.get("./CSVs/"+ApplicationFolder+"/Job_Library.csv"), Paths.get("./CSVs/"+ApplicationFolder+"/New_Auto_Scope.csv"));
         List<String> mergedLines = null;
 
         try {
             // Merge
             mergedLines = getMergedLines(paths);
-            Path target = Paths.get("./CSVs/Application_A/Job_Library.csv");
+            Path target = Paths.get("./CSVs/"+ApplicationFolder+"/Job_Library.csv");
             Files.write(target, mergedLines, Charset.forName("UTF-8"));
 
             // Clean new auto scope file
-            FileWriter writer = new FileWriter("./CSVs/Application_A/New_Auto_Scope.csv", false);
+            FileWriter writer = new FileWriter("./CSVs/"+ApplicationFolder+"/New_Auto_Scope.csv", false);
             writer.write(""); // input empty data
             writer.close();
 
@@ -243,49 +243,22 @@ public class JobDispatcherClass {
         return mergedLines;
     }
 
-     /*
-    Function to update CSV file with the Job name
+
+
+
+
+    /*
+        Function to generate Execution Result CSV file.
         Sample:
+            Script ID   Execution Status
+            11          Passed
+            12          Failed
+            13          Passed
 
-            ****BEFORE****
-            * Job Library CSV:
-               Script ID    Job Name                        Application     Location    Auto Tool   etc.
-               11                                           A               ALM         UFT
-               13                                           A               ALM         Worksoft
-               15                                           A               GitHub      Selenium
-
-            ****AFTER****
-               Script ID    Job Name                        Application     Location    Auto Tool   etc.
-               11           A_ALM_UFT_Script_11             A               ALM         UFT
-               13           A_ALM_Worksoft_Script_13        A               ALM         Worksoft
-               15           A_GitHub_Selenium_Script_15     A               GitHub      Selenium
-
-            Can be used as:
-                Update_CSV("sampleApplication","SampleData", 1, 1)
-        Author: Shahzad Rizvi - Mar 13, 2017
+        Author: Fernanda Menks - Mar 1, 2017
      */
-
-    public static String Update_CSV(String sApplicationFolder, String sData, Integer iColumn, Integer iRow) throws IOException{
-        //String csvFile = "./CSVs/"+ sApplicationFolder +"/Job_Library.csv";
-        String csvFile = "./Job_Library.csv";
-        String output = "./Job_Library2.csv";
-        List<String> updatedLines = null;
-        String[] sLine;
-        CSVReader reader = new CSVReader(new FileReader(csvFile));
-        List<String[]> csvBody = reader.readAll();
-
-        csvBody.get(iRow)[iColumn] = sData;
-        reader.close();
-
-        CSVWriter writer = new CSVWriter(new FileWriter(output));
-        writer.writeAll(csvBody);
-        writer.flush();
-        writer.close();
-
-        return output;
-    }
-    public void Export_Execution_Results() throws IOException {
-        String csvFile = "./CSVs/Execution_Result.csv";
+    public void Export_Execution_Results(String ApplicationFolder) throws IOException {
+        String csvFile = "./CSVs/"+ApplicationFolder+"/Execution_Result.csv";
         FileWriter writer = new FileWriter(csvFile);
         String ID = "";
         String Exec_Status = "";
@@ -305,15 +278,6 @@ public class JobDispatcherClass {
     }
 
 
-    private static String followCVSformat(String value) {
-
-        String result = value;
-        if (result.contains("\"")) {
-            result = result.replace("\"", "\"\"");
-        }
-        return result;
-
-    }
     public static void writeLine(Writer w, List<String> values) throws IOException {
 
         boolean first = true;
@@ -337,14 +301,23 @@ public class JobDispatcherClass {
         sb.append("\n");
         w.append(sb.toString());
     }
+    private static String followCVSformat(String value) {
+
+        String result = value;
+        if (result.contains("\"")) {
+            result = result.replace("\"", "\"\"");
+        }
+        return result;
+
+    }
 
 
     /*
-    Method to
+    Method to create ALM job based on template Jenkins config XML for ALM parameters.
  */
     public static void Create_ALM_Job(JobContainer tempJob) throws IOException {
         if (tempJob.Job_Name.isEmpty()){
-            tempJob.Job_Name = tempJob.Application + "_" + tempJob.Location + "_" + tempJob.Auto_Tool + "_Script_" + tempJob.Script_ID;
+            tempJob.Job_Name = tempJob.Application + "_Script_" + tempJob.Script_ID + "_"+ tempJob.Location + "_" + tempJob.Auto_Tool;
         }
 
         String csvFile = "./build/"+tempJob.Job_Name+".xml";
@@ -402,7 +375,26 @@ public class JobDispatcherClass {
 
     }
 
+    /*
+        Function to create Jenkins structure for new application
+        Author: Fernanda Menks - Mar 14, 2017
+    */
+    public static void InitiateJenkinsStructure(){
+        JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
+        //jenks.CreateView("TCoE Job Dispatcher");
+    }
 
+    /*
+        Function to create Jenkins structure for new application
+        Author: Fernanda Menks - Mar 14, 2017
+     */
+    public static void addApplicationInJenkins(String AppName){
+        JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
+        //Create seed job
+        jenks.CreateJob("SetupJenkinsStructure","./Template XML/Template_SetupJenkinsStructure.xml");
+        jenks.EnableJob("SetupJenkinsStructure");
+        jenks.BuildJob("SetupJenkinsStructure");
+    }
 
 
     /*
@@ -413,34 +405,44 @@ public class JobDispatcherClass {
      */
     public static void main(String[] args) throws IOException {
         List<String> tempCSVcontent = new ArrayList<String>();
-        JobDispatcherClass tempCSVfile = new JobDispatcherClass();
+        JobDispatcherClass objTemp = new JobDispatcherClass();
         JobContainer tempJob;
 
+
+        //1. Pre-set Jobs Library
+        //1.1. Setup initial Jenkins structure
+        objTemp.InitiateJenkinsStructure();
+        //1.1. Add new applications in Jenkins view
+        objTemp.addApplicationInJenkins("Application_A");
+        //1.2 Check if there are new jobs to load into Jobs Library
+        //1.3. Create pending jobs in the Library
+
+     /*
         //1. List input file with recommended job IDs
-        tempCSVfile.ReadScriptIDs();
+        objTemp.ReadScriptIDs("Application_A");
         System.out.println("Total Scripts in recommendation list = " + iTotalJobIDs);
         for(int i=0; i<iTotalJobIDs; i++){
             System.out.println(i+1 + ") "+ IDs.get(i));
         }
 
-
         //2. Merge new auto scope into pre-set job library
-        tempCSVcontent = tempCSVfile.Merge_New_Auto_Scope_into_Library();
+        tempCSVcontent = objTemp.Merge_New_Auto_Scope_into_Library("Application_A");
         System.out.println("\n\nTotal lines in Job Library CSV file = " + tempCSVcontent.size());
         for(String line : tempCSVcontent){
             System.out.println(line);
         }
 
-        tempCSVfile.ReadJobLibrary("Application_A");
+        //3. Scan all jobs in the library AFTER merge
+        objTemp.ReadJobLibrary("Application_A");
         System.out.println("\n\nTotal jobs objects in library = " + JobLibrary.size());
-        //tempCSVfile.getJob(13);
 
-        //3. Generate results CSV file
-        tempCSVfile.Export_Execution_Results();
+        //4. Generate results CSV file
+        objTemp.Export_Execution_Results("Application_A");
 
-        //4. Confirm that
-        tempJob = JobLibrary.get(0);
+        //5. Create ALM job based on template
+        tempJob = JobLibrary.get(4);
         Create_ALM_Job(tempJob);
+    */
 
     }
 }

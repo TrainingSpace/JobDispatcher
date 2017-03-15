@@ -315,8 +315,8 @@ $(document).ready(function(){
 	
 	$(".answers").on('click', function(event) {
 		if (questionsVal == 'q1') {	
-			/*var args = [finalScriptIds, 'JobIDs.csv'];			
-			exportScriptIdsToCSV.apply(this, args);	*/
+			var args = [finalScriptIds, 'JobIDs.csv'];
+			exportScriptIdsToCSV.apply(this, args);	
 			var rows = finalScriptIds.split("\n");
 			var scriptCount = rows.length - 1;
 			//alert('No: of scripts executed = ' + scriptCount);	
