@@ -14,6 +14,7 @@ public class JobDispatcherClass {
     public static int iExecutionRunID; // ID of the execution run currently in place
     public static List<String> IDs = new ArrayList<String>(); // List of job IDs in the recommendation file
     public static List<JobContainer> JobLibrary = new ArrayList<>(); // List of jobs listed in the library for a particular application
+    public static String Jenkins_URL = "http://localhost:8080/";
 
     //ALM specific config info
     public static String ALM_Server_Name = "ALM_Server_Name_From_Jenkins_Config"; // ALM server name listed in Jenkins server configuration
@@ -374,7 +375,26 @@ public class JobDispatcherClass {
 
     }
 
+    /*
+        Function to create Jenkins structure for new application
+        Author: Fernanda Menks - Mar 14, 2017
+    */
+    public static void InitiateJenkinsStructure(){
+        JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
+        //jenks.CreateView("TCoE Job Dispatcher");
+    }
 
+    /*
+        Function to create Jenkins structure for new application
+        Author: Fernanda Menks - Mar 14, 2017
+     */
+    public static void addApplicationInJenkins(String AppName){
+        JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
+        //Create seed job
+        jenks.CreateJob("SetupJenkinsStructure","./Template XML/Template_SetupJenkinsStructure.xml");
+        jenks.EnableJob("SetupJenkinsStructure");
+        jenks.BuildJob("SetupJenkinsStructure");
+    }
 
 
     /*
@@ -385,33 +405,44 @@ public class JobDispatcherClass {
      */
     public static void main(String[] args) throws IOException {
         List<String> tempCSVcontent = new ArrayList<String>();
-        JobDispatcherClass tempCSVfile = new JobDispatcherClass();
+        JobDispatcherClass objTemp = new JobDispatcherClass();
         JobContainer tempJob;
 
+
+        //1. Pre-set Jobs Library
+        //1.1. Setup initial Jenkins structure
+        objTemp.InitiateJenkinsStructure();
+        //1.1. Add new applications in Jenkins view
+        objTemp.addApplicationInJenkins("Application_A");
+        //1.2 Check if there are new jobs to load into Jobs Library
+        //1.3. Create pending jobs in the Library
+
+     /*
         //1. List input file with recommended job IDs
-        tempCSVfile.ReadScriptIDs("Application_A");
+        objTemp.ReadScriptIDs("Application_A");
         System.out.println("Total Scripts in recommendation list = " + iTotalJobIDs);
         for(int i=0; i<iTotalJobIDs; i++){
             System.out.println(i+1 + ") "+ IDs.get(i));
         }
 
         //2. Merge new auto scope into pre-set job library
-        tempCSVcontent = tempCSVfile.Merge_New_Auto_Scope_into_Library("Application_A");
+        tempCSVcontent = objTemp.Merge_New_Auto_Scope_into_Library("Application_A");
         System.out.println("\n\nTotal lines in Job Library CSV file = " + tempCSVcontent.size());
         for(String line : tempCSVcontent){
             System.out.println(line);
         }
 
         //3. Scan all jobs in the library AFTER merge
-        tempCSVfile.ReadJobLibrary("Application_A");
+        objTemp.ReadJobLibrary("Application_A");
         System.out.println("\n\nTotal jobs objects in library = " + JobLibrary.size());
 
         //4. Generate results CSV file
-        tempCSVfile.Export_Execution_Results("Application_A");
+        objTemp.Export_Execution_Results("Application_A");
 
         //5. Create ALM job based on template
         tempJob = JobLibrary.get(4);
         Create_ALM_Job(tempJob);
+    */
 
     }
 }

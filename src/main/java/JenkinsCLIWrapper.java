@@ -131,7 +131,7 @@ public class JenkinsCLIWrapper {
 
     public void CreateFolder(String folderName) {
         System.out.println("Creating folder "+ folderName +"...");
-        sCommand = sCommand + " create-job \"" + folderName + "\" < empty_folder.xml";
+        sCommand = sCommand + " create-job \"" + folderName + "\" < \"Template XML/empty_folder.xml\"";
         System.out.println(sCommand);
         RunCommand(sCommand);
         System.out.println("Done.");
@@ -147,8 +147,8 @@ public class JenkinsCLIWrapper {
 
 
     public static void main(String args[]) {
-        JenkinsCLIWrapper jenks = new JenkinsCLIWrapper("http://fefezinha.com:8080/jenkins");
-        //jenks.CreateJob("BLABLABLA","teste.xml");
+        JenkinsCLIWrapper jenks = new JenkinsCLIWrapper("http://localhost:8080");
+        //jenks.CreateJob("BLABLABLA","./Template XML/Template_Maven_Job.xml");
         //jenks.BuildJob("TesteCLI");
         //jenks.DisableJob("TesteCLI");
         //jenks.EnableJob("TesteCLI");
