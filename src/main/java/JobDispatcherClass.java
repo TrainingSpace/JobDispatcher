@@ -7,7 +7,6 @@ import java.util.*;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
-
 public class JobDispatcherClass {
 
     //***** GLOBAL VARIABLES ****
