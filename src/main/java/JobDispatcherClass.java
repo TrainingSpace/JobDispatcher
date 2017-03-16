@@ -437,18 +437,21 @@ public class JobDispatcherClass {
         Author: Shahzad Rizvi - Mar 13, 2017
      */
 
+
     public static String Update_CSV(String sApplicationFolder, String sData, Integer iColumn, Integer iRow) throws IOException{
-        //String csvFile = "./CSVs/"+ sApplicationFolder +"/Job_Library.csv";
-        String csvFile = "./Job_Library.csv";
-        String output = "./Job_Library2.csv";
+        String csvFile = "./CSVs/"+ sApplicationFolder +"/Job_Library.csv";
+        //String csvFile = "./Job_Library.csv";
+        String output = "./Job_Library_updated.csv";
         List<String> updatedLines = null;
         String[] sLine;
         CSVReader reader = new CSVReader(new FileReader(csvFile));
         List<String[]> csvBody = reader.readAll();
 
+        //Update the Row and Column wit the data
         csvBody.get(iRow)[iColumn] = sData;
         reader.close();
 
+        //write the updated CSV out
         CSVWriter writer = new CSVWriter(new FileWriter(output));
         writer.writeAll(csvBody);
         writer.flush();
