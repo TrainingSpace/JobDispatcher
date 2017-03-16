@@ -131,13 +131,12 @@ public class JobDispatcherClass {
                     temp_GitHub_Feature = "";
                     temp_GitHub_Repository_URL = "";
                 }
-                System.out.println("job ID = " + temp_Script_ID);
                 tempJob = new JobContainer(temp_Script_ID, temp_Job_Name, temp_Application, temp_Location, temp_Auto_Tool
                              , temp_ALM_Domain, temp_ALM_Project, temp_ALM_Execution_Path, temp_GitHub_Feature
                             , temp_GitHub_Repository_URL);
-                System.out.println("job BEFORE add = " + tempJob.Job_Name);
+
                 JobLibrary.add(tempJob);
-                System.out.println("job AFTER add = " + tempJob.Job_Name);
+
             }//end of loop
 
         } catch (FileNotFoundException e) {
@@ -326,18 +325,16 @@ public class JobDispatcherClass {
     Author: Fernanda Menks - March 16, 2017
  */
     public void Create_ALM_Job(JobContainer tempJob) throws IOException {
-        System.out.println(".... Inside create alm job " + tempJob.Job_Name);
-        if ( (tempJob.Job_Name.isEmpty()) && (tempJob.Location == "ALM")) {
-            System.out.println(".... creating job " + tempJob.Job_Name);
 
-                    //1. Define job name
+        if ( (tempJob.Job_Name.isEmpty()) && (tempJob.Location.contentEquals("ALM"))) {
+
+            //1. Define job name
             tempJob.Job_Name = tempJob.Application + "_Script_" + tempJob.Script_ID + "_" + tempJob.Location + "_" + tempJob.Auto_Tool;
+            System.out.println(".... creating ALM job " + tempJob.Job_Name);
 
-
-            //2. Create XML file under .build/application_name folder
-            tempJob.XML_Path = "./build/" + tempJob.Application + "/" + tempJob.Job_Name + ".xml";
-            //String csvFile = "./build/" + tempJob.Application + "/" + tempJob.Job_Name + ".xml";
-            FileWriter writer = new FileWriter(tempJob.XML_Path);
+            //2. Create XML file under for the application job
+            String XML_Path = "./build/" + tempJob.Job_Name + ".xml";
+            FileWriter writer = new FileWriter(XML_Path);
 
             //3. Populate the XML with parameters from job
             writer.write("<?xml version='1.0' encoding='UTF-8'?>\n" +
@@ -392,7 +389,9 @@ public class JobDispatcherClass {
 
             //4. Create ALM job in Jenkins
             JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
-            jenks.CreateJob(tempJob.Job_Name,tempJob.XML_Path);
+            jenks.CreateJob(tempJob.Job_Name,XML_Path);
+
+
 
         }// end condition if job doesn't exist and is ALM
     }
@@ -413,6 +412,7 @@ public class JobDispatcherClass {
     public void addApplicationInJenkins(String AppName){
         JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
         jenks.BuildJob("SetupJenkinsStructure", "Application_Name", AppName);
+        jenks.AddJobToView(AppName, "TCoE Job Dispatcher");
     }
 
 /*
@@ -484,7 +484,7 @@ public class JobDispatcherClass {
         //for(int i=0; i<JobLibrary.size(); i++) {
         for (JobContainer tempJob: (List<JobContainer>)JobLibrary){
             //tempJob = new (JobContainer)JobLibrary.get(i);
-            System.out.println("\nAttempting to create job # for "+ tempJob.Job_Name);
+            System.out.println("\nAttempting to create job # for "+ tempJob.Script_ID + " and this is for "+ tempJob.Location);
             objTemp.Create_ALM_Job(tempJob);
             System.out.println("Next...");
         }
