@@ -103,6 +103,16 @@ public class JenkinsCLIWrapper {
         System.out.println("Done.");
     }
 
+    public void BuildJob(String jobName, String Parameter, String Parameter_value) {
+        System.out.println("Building job with parameter " + jobName + "...");
+        sCommand = "cmd /c java -jar jenkins-cli.jar -s \"" + sRootURL + "\"";
+        sCommand = sCommand + " build \"" + jobName + "\"";
+        sCommand = sCommand + " -p \"" + Parameter + "=" + Parameter_value + "\"";
+        System.out.println(sCommand);
+        RunCommand(sCommand);
+        System.out.println("Done.");
+    }
+
     public void DisableJob(String jobName) {
         System.out.println("Disabling job " + jobName + "...");
         sCommand = "cmd /c java -jar jenkins-cli.jar -s \"" + sRootURL + "\"";
@@ -163,9 +173,9 @@ public class JenkinsCLIWrapper {
 
 
     public static void main(String args[]) {
-        JenkinsCLIWrapper jenks = new JenkinsCLIWrapper("http://localhost:8080/jenkins");
+        JenkinsCLIWrapper jenks = new JenkinsCLIWrapper("http://localhost:8080");
         //jenks.CreateJob("BLABLABLA","./Template XML/Template_Maven_Job.xml");
-        //jenks.BuildJob("TesteCLI");
+        jenks.BuildJob("SetupJenkinsStructure", "Application_Name", "xxxxxx");
         //jenks.DisableJob("TesteCLI");
         //jenks.EnableJob("TesteCLI");
         //jenks.GetJob("TesteCLI","testeCLI.xml");
@@ -173,7 +183,7 @@ public class JenkinsCLIWrapper {
         //jenks.CreateView("Oi Fefe");
         //jenks.DeleteView("Oi Fefe");
         //jenks.CreateFolder("Oi Fefe folder");
-        jenks.DeleteFolder("Oi Fefe folder");
+        //jenks.DeleteFolder("Oi Fefe folder");
     }
 
 }
