@@ -32,13 +32,16 @@ String folderExecution = &apos;Executions&apos;
 
 
 //Create folders per application
-folder(&apos;App_&apos;+Application_Name) {
+//folder(&apos;App_&apos;+Application_Name) {
+  folder(Application_Name) {
     description &apos;Scripts to validate application: &apos; + Application_Name
   
     primaryView(baseView)
 }
-folder(&quot;App_$Application_Name/$folderLibrary&quot;){}
-folder(&quot;App_$Application_Name/$folderExecution&quot;){}
+//folder(&quot;App_$Application_Name/$folderLibrary&quot;){}
+//folder(&quot;App_$Application_Name/$folderExecution&quot;){}
+folder(&quot;$Application_Name/$folderLibrary&quot;){}
+folder(&quot;$Application_Name/$folderExecution&quot;){}
 
 
 //Setup view including all folders per application
@@ -50,9 +53,9 @@ listView(baseView) {
             +&apos;\n\n&apos;)
 
     //Config view
-    jobs {
-        regex(&apos;.*App_*.*&apos;)
-    }
+    //jobs {
+    //    regex(&apos;.*App_*.*&apos;)
+   // }
     //jobs{
     //    name(&quot;$Application_Name&quot;)
     //}
