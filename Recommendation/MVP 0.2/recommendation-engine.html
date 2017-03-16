@@ -43,14 +43,25 @@
 
 
 <body>
+	<font face="calibri">
 	<!--<h2>TCoE Recommendation Engine</h2>-->
 	
 	<div>
-		<img src="TestOpsEngineLogo.png" />
+		<img src="TestOpsEngineLogo.png"  style="width: 50%; height: 50%"/>
 	</div>
-	<hr />
+	<!hr />
 	
 	<!--Options-->
+	<br><br>
+	<select id="application">
+		<option value="default">What application are we discussing today?</option>
+		<option value="app1">SAP</option>
+		<option value="app2">OPA</option>
+		<option value="app3">WTP</option>
+		<option value="app4">Demo App</option>
+	</select>
+	<br><br>
+
 	<select id="questions">
 		  <option value="default">Select an option?</option>
 		  <option value="q1">Are the new features working?</option>
@@ -66,7 +77,7 @@
 	<div id="ReqsContainer" class="clearfix">
 		<div style="font-weight: bold;"> Upload Requirements:</div>
 		<input type="file" id="reqfiles" name="reqfiles[]" multiple />
-		<hr />
+		<br><br>
 	</div>	
 	
 		
@@ -74,14 +85,14 @@
 	<div id="scriptsContainer" class="clearfix">
 		<div style="font-weight: bold;"> Upload Scripts:</div>
 		<input type="file" id="scriptfiles" name="scriptfiles[]" multiple />
-		<hr />
+		<br><br>
 	</div>	
 	
 	<!-- Execution List Data -->	
 	<div id="execContainer" class="clearfix">
 		<div style="font-weight: bold;"> Upload Execution List:</div>
 		<input type="file" id="executionfiles" name="executionfiles[]" multiple />
-		<hr />
+		<br><br>
 	</div>
 		
 	<!-- defects List Data -->		
@@ -113,8 +124,8 @@
 	<!--<button value="Answer" id="anwsers">Answers</button>-->
 	<div id="resultContainer">
 	</div>
-	
-	
-	
+
+
+	</font>
 </body>
 </html>
