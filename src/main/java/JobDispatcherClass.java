@@ -211,12 +211,14 @@ public class JobDispatcherClass {
         List<String> mergedLines = null;
 
         try {
-            // Merge
+            // 1. If the new auto scope file doesn't exist or is empty, we can skip the entire merge activity ----------->>>> PENDING TO IMPLEMENT THIS!
+
+            // 2. Merge
             mergedLines = getMergedLines(paths);
             Path target = Paths.get("./CSVs/"+ApplicationFolder+"/Job_Library.csv");
             Files.write(target, mergedLines, Charset.forName("UTF-8"));
 
-            // Clean new auto scope file
+            // 3. Clean new auto scope file
             FileWriter writer = new FileWriter("./CSVs/"+ApplicationFolder+"/New_Auto_Scope.csv", false);
             writer.write(""); // input empty data
             writer.close();
@@ -319,24 +321,28 @@ public class JobDispatcherClass {
     Method to create ALM job based on template Jenkins config XML for ALM parameters.
     Steps:
         1. Define job name
-        2. Create XML file under .build/application_name folder
-        3. Populate the XML with parameters from job
-        4. Create ALM job in Jenkins
+        2. Save job name in the Job_Library CSV file
+        3. Create XML file under .build/application_name folder
+        4. Populate the XML with parameters from job
+        5. Create ALM job in Jenkins
     Author: Fernanda Menks - March 16, 2017
  */
-    public void Create_ALM_Job(JobContainer tempJob) throws IOException {
+    public void Create_ALM_Job(JobContainer tempJob, int iRow_JobLibrary) throws IOException {
 
         if ( (tempJob.Job_Name.isEmpty()) && (tempJob.Location.contentEquals("ALM"))) {
+            System.out.println("Creating ALM job for scrip #" + tempJob.Script_ID);
 
             //1. Define job name
             tempJob.Job_Name = tempJob.Application + "_Script_" + tempJob.Script_ID + "_" + tempJob.Location + "_" + tempJob.Auto_Tool;
-            System.out.println(".... creating ALM job " + tempJob.Job_Name);
 
-            //2. Create XML file under for the application job
+            //2. Save job name in the Job_Library CSV file
+            Update_CSV(tempJob.Application,tempJob.Job_Name,1,iRow_JobLibrary+1);
+
+            //3. Create XML file under for the application job
             String XML_Path = "./build/" + tempJob.Job_Name + ".xml";
             FileWriter writer = new FileWriter(XML_Path);
 
-            //3. Populate the XML with parameters from job
+            //4. Populate the XML with parameters from job
             writer.write("<?xml version='1.0' encoding='UTF-8'?>\n" +
                     "<project>\n" +
                     "  <actions/>\n" +
@@ -387,7 +393,7 @@ public class JobDispatcherClass {
             writer.flush();
             writer.close();
 
-            //4. Create ALM job in Jenkins
+            //5. Create ALM job in Jenkins
             JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
             jenks.CreateJob(tempJob.Job_Name,XML_Path);
 
@@ -441,7 +447,8 @@ public class JobDispatcherClass {
     public static String Update_CSV(String sApplicationFolder, String sData, Integer iColumn, Integer iRow) throws IOException{
         String csvFile = "./CSVs/"+ sApplicationFolder +"/Job_Library.csv";
         //String csvFile = "./Job_Library.csv";
-        String output = "./Job_Library_updated.csv";
+        //String output = "./Job_Library_updated.csv";
+        String output = "./CSVs/"+ sApplicationFolder +"/Job_Library.csv";
         List<String> updatedLines = null;
         String[] sLine;
         CSVReader reader = new CSVReader(new FileReader(csvFile));
@@ -470,7 +477,7 @@ public class JobDispatcherClass {
     public static void main(String[] args) throws IOException {
         List<String> tempCSVcontent = new ArrayList<String>();
         JobDispatcherClass objTemp = new JobDispatcherClass();
-        //JobContainer tempJob = new JobContainer();
+        JobContainer tempJob = new JobContainer();
         String application_name = "";
 
 
@@ -478,20 +485,19 @@ public class JobDispatcherClass {
         //1.1. Setup initial Jenkins structure
         objTemp.InitiateJenkinsStructure();
         //1.2. Add new applications in Jenkins view
-        application_name = "Application_A";
+        application_name = "Dummy";
         objTemp.addApplicationInJenkins(application_name);
         //1.3. Check if there are new jobs to load into Jobs Library
         objTemp.Merge_New_Auto_Scope_into_Library(application_name);
         objTemp.ReadJobLibrary(application_name);
         //1.4. Create pending jobs in the Library
-        //for(int i=0; i<JobLibrary.size(); i++) {
-        for (JobContainer tempJob: (List<JobContainer>)JobLibrary){
-            //tempJob = new (JobContainer)JobLibrary.get(i);
-            System.out.println("\nAttempting to create job # for "+ tempJob.Script_ID + " and this is for "+ tempJob.Location);
-            objTemp.Create_ALM_Job(tempJob);
-            System.out.println("Next...");
+        for(int i=0; i<JobLibrary.size(); i++) {
+        //for (JobContainer tempJob: (List<JobContainer>)JobLibrary){
+            tempJob = JobLibrary.get(i);
+            objTemp.Create_ALM_Job(tempJob, i);
+
         }
-        System.out.println("Done");
+
 
 
      /*
@@ -521,6 +527,8 @@ public class JobDispatcherClass {
         Create_ALM_Job(tempJob);
     */
 
+       // objTemp.Update_CSV("Dummy","testing...",1,1);
+        //objTemp.Update_CSV("Dummy","something else",1,3);
     }
 }
 

@@ -172,10 +172,20 @@ public class JenkinsCLIWrapper {
     }
 
 
+    public void AddJobToView(String jobName, String viewName) {
+        System.out.println("Adding job " + jobName +" into view " + viewName + " ...");
+        sCommand = "cmd /c java -jar jenkins-cli.jar -s \"" + sRootURL + "\"";
+        sCommand = sCommand + " add-job-to-view \"" + viewName + "\" \"" + jobName + "\"";
+        System.out.println(sCommand);
+        RunCommand(sCommand);
+        System.out.println("Done.");
+    }
+
     public static void main(String args[]) {
         JenkinsCLIWrapper jenks = new JenkinsCLIWrapper("http://localhost:8080");
-        //jenks.CreateJob("BLABLABLA","./Template XML/Template_Maven_Job.xml");
-        jenks.BuildJob("SetupJenkinsStructure", "Application_Name", "xxxxxx");
+        jenks.CreateJob("C:/Program Files (x86)/Jenkins/jobs/Application_A/jobs/Job Library/jobs/XXXXX","./Template XML/Template_Maven_Job.xml");
+        //jenks.AddJobToView("BLABLABLA", "TCoE Job Dispatcher");
+        //jenks.BuildJob("SetupJenkinsStructure", "Application_Name", "xxxxxx");
         //jenks.DisableJob("TesteCLI");
         //jenks.EnableJob("TesteCLI");
         //jenks.GetJob("TesteCLI","testeCLI.xml");
