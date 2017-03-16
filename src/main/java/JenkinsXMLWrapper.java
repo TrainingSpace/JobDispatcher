@@ -58,7 +58,7 @@ public class JenkinsXMLWrapper {
         // every Hudson model object exposes the .../api/xml, but in this example
         // we'll just take the root object as an example
         XMLRoot root;
-        root = new XMLRoot("http://localhost:8080/jenkins/api/xml");
+        root = new XMLRoot("http://localhost:8080/api/xml");
         // scan through the job list and print its data
         root.ListAllJobs();
     }

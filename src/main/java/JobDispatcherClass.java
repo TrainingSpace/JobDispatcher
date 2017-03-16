@@ -81,7 +81,7 @@ public class JobDispatcherClass {
 
 
     /*
-    Function to read all jobs from existent library in a particular application folder.
+    Function to read all jobs from existent library in a particular application folder and populate array of Jobs
     Sample:   Job Library
        Script ID    Job Name                                    Application     Location    Auto Tool   etc.
        11           Application_A_Script_11_ALM_UFT             Application_A   ALM         UFT
@@ -131,10 +131,13 @@ public class JobDispatcherClass {
                     temp_GitHub_Feature = "";
                     temp_GitHub_Repository_URL = "";
                 }
+                System.out.println("job ID = " + temp_Script_ID);
                 tempJob = new JobContainer(temp_Script_ID, temp_Job_Name, temp_Application, temp_Location, temp_Auto_Tool
                              , temp_ALM_Domain, temp_ALM_Project, temp_ALM_Execution_Path, temp_GitHub_Feature
                             , temp_GitHub_Repository_URL);
+                System.out.println("job BEFORE add = " + tempJob.Job_Name);
                 JobLibrary.add(tempJob);
+                System.out.println("job AFTER add = " + tempJob.Job_Name);
             }//end of loop
 
         } catch (FileNotFoundException e) {
@@ -315,86 +318,101 @@ public class JobDispatcherClass {
 
     /*
     Method to create ALM job based on template Jenkins config XML for ALM parameters.
+    Steps:
+        1. Define job name
+        2. Create XML file under .build/application_name folder
+        3. Populate the XML with parameters from job
+        4. Create ALM job in Jenkins
+    Author: Fernanda Menks - March 16, 2017
  */
-    public static void Create_ALM_Job(JobContainer tempJob) throws IOException {
-        if (tempJob.Job_Name.isEmpty()){
-            tempJob.Job_Name = tempJob.Application + "_Script_" + tempJob.Script_ID + "_"+ tempJob.Location + "_" + tempJob.Auto_Tool;
-        }
+    public void Create_ALM_Job(JobContainer tempJob) throws IOException {
+        System.out.println(".... Inside create alm job " + tempJob.Job_Name);
+        if ( (tempJob.Job_Name.isEmpty()) && (tempJob.Location == "ALM")) {
+            System.out.println(".... creating job " + tempJob.Job_Name);
 
-        String csvFile = "./build/"+tempJob.Job_Name+".xml";
-        FileWriter writer = new FileWriter(csvFile);
+                    //1. Define job name
+            tempJob.Job_Name = tempJob.Application + "_Script_" + tempJob.Script_ID + "_" + tempJob.Location + "_" + tempJob.Auto_Tool;
 
-        writer.write("<?xml version='1.0' encoding='UTF-8'?>\n" +
-                "<project>\n" +
-                "  <actions/>\n" +
-                "  <description>"+"Pre-set job item for ALM script ID "+tempJob.Script_ID+" | Auto tool = "+tempJob.Auto_Tool+"</description>\n" +
-                "  <keepDependencies>false</keepDependencies>\n"+
-                "<properties/>\n" +
-                "  <scm class=\"hudson.scm.NullSCM\"/>\n" +
-                "  <canRoam>true</canRoam>\n" +
-                "  <disabled>false</disabled>\n" +
-                "  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>\n" +
-                "  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>\n" +
-                "  <triggers/>\n" +
-                "  <concurrentBuild>false</concurrentBuild>\n" +
-                "  <builders>\n" +
-                "    <com.hp.application.automation.tools.run.RunFromAlmBuilder plugin=\"hp-application-automation-tools-plugin@5.1\">\n" +
-                "      <runFromAlmModel>\n" +
-                "        <almServerName>"+ALM_Server_Name+"</almServerName>\n" +
-                "        <almUserName>"+ALM_Username+"</almUserName>\n" +
-                "        <almPassword>"+ALM_Password+"</almPassword>\n" +
-                "        <almDomain>"+tempJob.ALM_Domain+"</almDomain>\n" +
-                "        <almProject>"+tempJob.ALM_Project+"</almProject>\n" +
-                "        <almTestSets>"+tempJob.ALM_Execution_Path+"</almTestSets>\n" +
-                "        <almTimeout></almTimeout>\n" +
-                "        <almRunMode>RUN_LOCAL</almRunMode>\n" +
-                "        <almRunHost></almRunHost>\n" +
-                "      </runFromAlmModel>\n" +
-                "      <ResultFilename>ApiResults.xml</ResultFilename>\n" +
-                "      <ParamFileName>ApiRun.txt</ParamFileName>\n" +
-                "    </com.hp.application.automation.tools.run.RunFromAlmBuilder>\n" +
-                "  </builders>\n" +
-                "  <publishers>\n" +
-                "    <com.hp.application.automation.tools.results.RunResultRecorder plugin=\"hp-application-automation-tools-plugin@5.1\">\n" +
-                "      <__resultsPublisherModel>\n" +
-                "        <archiveTestResultsMode>ALWAYS_ARCHIVE_TEST_REPORT</archiveTestResultsMode>\n" +
-                "      </__resultsPublisherModel>\n" +
-                "    </com.hp.application.automation.tools.results.RunResultRecorder>\n" +
-                "  </publishers>\n" +
-                "  <buildWrappers>\n" +
-                "    <hudson.plugins.build__timeout.BuildTimeoutWrapper plugin=\"build-timeout@1.18\">\n" +
-                "      <strategy class=\"hudson.plugins.build_timeout.impl.LikelyStuckTimeOutStrategy\"/>\n" +
-                "      <operationList>\n" +
-                "        <hudson.plugins.build__timeout.operations.AbortOperation/>\n" +
-                "      </operationList>\n" +
-                "    </hudson.plugins.build__timeout.BuildTimeoutWrapper>\n" +
-                "  </buildWrappers>\n" +
-                "</project>");
 
-        writer.flush();
-        writer.close();
+            //2. Create XML file under .build/application_name folder
+            tempJob.XML_Path = "./build/" + tempJob.Application + "/" + tempJob.Job_Name + ".xml";
+            //String csvFile = "./build/" + tempJob.Application + "/" + tempJob.Job_Name + ".xml";
+            FileWriter writer = new FileWriter(tempJob.XML_Path);
 
+            //3. Populate the XML with parameters from job
+            writer.write("<?xml version='1.0' encoding='UTF-8'?>\n" +
+                    "<project>\n" +
+                    "  <actions/>\n" +
+                    "  <description>" + "Pre-set job item for ALM script ID " + tempJob.Script_ID + " | Auto tool = " + tempJob.Auto_Tool + "</description>\n" +
+                    "  <keepDependencies>false</keepDependencies>\n" +
+                    "<properties/>\n" +
+                    "  <scm class=\"hudson.scm.NullSCM\"/>\n" +
+                    "  <canRoam>true</canRoam>\n" +
+                    "  <disabled>false</disabled>\n" +
+                    "  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>\n" +
+                    "  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>\n" +
+                    "  <triggers/>\n" +
+                    "  <concurrentBuild>false</concurrentBuild>\n" +
+                    "  <builders>\n" +
+                    "    <com.hp.application.automation.tools.run.RunFromAlmBuilder plugin=\"hp-application-automation-tools-plugin@5.1\">\n" +
+                    "      <runFromAlmModel>\n" +
+                    "        <almServerName>" + ALM_Server_Name + "</almServerName>\n" +
+                    "        <almUserName>" + ALM_Username + "</almUserName>\n" +
+                    "        <almPassword>" + ALM_Password + "</almPassword>\n" +
+                    "        <almDomain>" + tempJob.ALM_Domain + "</almDomain>\n" +
+                    "        <almProject>" + tempJob.ALM_Project + "</almProject>\n" +
+                    "        <almTestSets>" + tempJob.ALM_Execution_Path + "</almTestSets>\n" +
+                    "        <almTimeout></almTimeout>\n" +
+                    "        <almRunMode>RUN_LOCAL</almRunMode>\n" +
+                    "        <almRunHost></almRunHost>\n" +
+                    "      </runFromAlmModel>\n" +
+                    "      <ResultFilename>ApiResults.xml</ResultFilename>\n" +
+                    "      <ParamFileName>ApiRun.txt</ParamFileName>\n" +
+                    "    </com.hp.application.automation.tools.run.RunFromAlmBuilder>\n" +
+                    "  </builders>\n" +
+                    "  <publishers>\n" +
+                    "    <com.hp.application.automation.tools.results.RunResultRecorder plugin=\"hp-application-automation-tools-plugin@5.1\">\n" +
+                    "      <__resultsPublisherModel>\n" +
+                    "        <archiveTestResultsMode>ALWAYS_ARCHIVE_TEST_REPORT</archiveTestResultsMode>\n" +
+                    "      </__resultsPublisherModel>\n" +
+                    "    </com.hp.application.automation.tools.results.RunResultRecorder>\n" +
+                    "  </publishers>\n" +
+                    "  <buildWrappers>\n" +
+                    "    <hudson.plugins.build__timeout.BuildTimeoutWrapper plugin=\"build-timeout@1.18\">\n" +
+                    "      <strategy class=\"hudson.plugins.build_timeout.impl.LikelyStuckTimeOutStrategy\"/>\n" +
+                    "      <operationList>\n" +
+                    "        <hudson.plugins.build__timeout.operations.AbortOperation/>\n" +
+                    "      </operationList>\n" +
+                    "    </hudson.plugins.build__timeout.BuildTimeoutWrapper>\n" +
+                    "  </buildWrappers>\n" +
+                    "</project>");
+
+            writer.flush();
+            writer.close();
+
+            //4. Create ALM job in Jenkins
+            JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
+            jenks.CreateJob(tempJob.Job_Name,tempJob.XML_Path);
+
+        }// end condition if job doesn't exist and is ALM
     }
 
     /*
         Function to create Jenkins structure for new application
         Author: Fernanda Menks - Mar 14, 2017
     */
-    public static void InitiateJenkinsStructure(){
+    public void InitiateJenkinsStructure(){
         JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
-        //jenks.CreateView("TCoE Job Dispatcher");
+        jenks.CreateJob("SetupJenkinsStructure","./Template XML/Template_SetupJenkinsStructure.xml");
     }
 
     /*
         Function to create Jenkins structure for new application
         Author: Fernanda Menks - Mar 14, 2017
      */
-    public static void addApplicationInJenkins(String AppName){
+    public void addApplicationInJenkins(String AppName){
         JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
-        //Create seed job
-        jenks.CreateJob("SetupJenkinsStructure","./Template XML/Template_SetupJenkinsStructure.xml");
-        jenks.EnableJob("SetupJenkinsStructure");
-        jenks.BuildJob("SetupJenkinsStructure");
+        jenks.BuildJob("SetupJenkinsStructure", "Application_Name", AppName);
     }
 
 /*
@@ -449,16 +467,29 @@ public class JobDispatcherClass {
     public static void main(String[] args) throws IOException {
         List<String> tempCSVcontent = new ArrayList<String>();
         JobDispatcherClass objTemp = new JobDispatcherClass();
-        JobContainer tempJob;
+        //JobContainer tempJob = new JobContainer();
+        String application_name = "";
 
 
         //1. Pre-set Jobs Library
         //1.1. Setup initial Jenkins structure
         objTemp.InitiateJenkinsStructure();
-        //1.1. Add new applications in Jenkins view
-        objTemp.addApplicationInJenkins("Application_A");
-        //1.2 Check if there are new jobs to load into Jobs Library
-        //1.3. Create pending jobs in the Library
+        //1.2. Add new applications in Jenkins view
+        application_name = "Application_A";
+        objTemp.addApplicationInJenkins(application_name);
+        //1.3. Check if there are new jobs to load into Jobs Library
+        objTemp.Merge_New_Auto_Scope_into_Library(application_name);
+        objTemp.ReadJobLibrary(application_name);
+        //1.4. Create pending jobs in the Library
+        //for(int i=0; i<JobLibrary.size(); i++) {
+        for (JobContainer tempJob: (List<JobContainer>)JobLibrary){
+            //tempJob = new (JobContainer)JobLibrary.get(i);
+            System.out.println("\nAttempting to create job # for "+ tempJob.Job_Name);
+            objTemp.Create_ALM_Job(tempJob);
+            System.out.println("Next...");
+        }
+        System.out.println("Done");
+
 
      /*
         //1. List input file with recommended job IDs
