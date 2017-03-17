@@ -1,6 +1,6 @@
-"Script ID","Job Name","Application","Location","Auto Tool","ALM Domain","ALM Project","ALM Execution path","GitHub Feature file name","GitHub Repository URL"
-"11","Dummy_Script_11_ALM_UFT","Dummy","ALM","UFT","Domain_X","Project_A","RootFolderUFT test set","",""
-"13","Dummy_Script_13_ALM_Worksoft","Dummy","ALM","Worksoft","Domain_Y","Project_B","RootFolderWorksoft test set","",""
-"15","","Dummy","GitHub","Selenium","","","","F15_WWWW.feature","https://github.com/Organization/Repository_BDD"
-"12","Dummy_Script_12_ALM_LeanFT","Dummy","ALM","LeanFT","Domain_X","Project_B","RootFolderLeanFT test set","",""
-"14","","Dummy","GitHub","Selenium","","","","F14_ZZZZ.feature","https://github.com/Organization/Repository_BDD"
+Script ID,Job Name,Application,Location,Auto Tool,ALM Domain,ALM Project,ALM Execution path,GitHub Feature file name,GitHub Repository URL
+11,,Application_A,ALM,UFT,Domain_X,Project_A,Root\Folder\UFT test set,,
+13,,Application_A,ALM,Worksoft,Domain_Y,Project_B,Root\Folder\Worksoft test set,,
+15,,Application_A,GitHub,Selenium,,,,F15_WWWW.feature,https://github.com/Organization/Repository_BDD
+12,,Application_A,ALM,LeanFT,Domain_X,Project_B,Root\Folder\LeanFT test set,,
+14,,Application_A,GitHub,Selenium,,,,F14_ZZZZ.feature,https://github.com/Organization/Repository_BDD
