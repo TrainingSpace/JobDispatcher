@@ -9,7 +9,7 @@
         <hudson.model.StringParameterDefinition>
           <name>Application_Name</name>
           <description></description>
-          <defaultValue>Application_A</defaultValue>
+          <defaultValue>Default_Application_Name</defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -32,14 +32,11 @@ String folderExecution = &apos;Executions&apos;
 
 
 //Create folders per application
-//folder(&apos;App_&apos;+Application_Name) {
   folder(Application_Name) {
     description &apos;Scripts to validate application: &apos; + Application_Name
   
     primaryView(baseView)
 }
-//folder(&quot;App_$Application_Name/$folderLibrary&quot;){}
-//folder(&quot;App_$Application_Name/$folderExecution&quot;){}
 folder(&quot;$Application_Name/$folderLibrary&quot;){}
 folder(&quot;$Application_Name/$folderExecution&quot;){}
 

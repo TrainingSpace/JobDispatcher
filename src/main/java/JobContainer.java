@@ -14,7 +14,6 @@ public class JobContainer{
     String ALM_Execution_Path;
     String GitHub_Feature;
     String GitHub_Repository_URL;
-    String XML_Path;
 
     public JobContainer(int pScript_ID, String pJob_name, String pApplication, String pLocation, String pAuto_Tool
             , String pALM_Domain, String pALM_Project, String pALM_Execution_Path, String pGitHub_Feature
@@ -29,7 +28,6 @@ public class JobContainer{
         ALM_Execution_Path = pALM_Execution_Path;
         GitHub_Feature = pGitHub_Feature;
         GitHub_Repository_URL = pGitHub_Repository_URL;
-        XML_Path = "";
     }
 
     public JobContainer() {
@@ -43,6 +41,5 @@ public class JobContainer{
         ALM_Execution_Path = "";
         GitHub_Feature = "";
         GitHub_Repository_URL = "";
-        XML_Path = "";
     }
 }

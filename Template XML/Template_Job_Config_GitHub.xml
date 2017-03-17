@@ -8,6 +8,15 @@
       <projectUrl>https://github.com/TrainingSpace/Training_BDD/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>FEATURE_NAME</name>
+          <description></description>
+          <defaultValue>&quot;&apos;src/test/features/Sample banking acceptance criteria.feature&apos;&quot;</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@2.4.4">
     <configVersion>2</configVersion>
@@ -32,7 +41,11 @@
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
-  <goals>clean install</goals>
+  <rootModule>
+    <groupId>com.accenture.cucumber</groupId>
+    <artifactId>Training_BDD</artifactId>
+  </rootModule>
+  <goals>clean verify -Dcucumber.options=$FEATURE_NAME</goals>
   <aggregatorStyleBuild>true</aggregatorStyleBuild>
   <incrementalBuild>false</incrementalBuild>
   <ignoreUpstremChanges>true</ignoreUpstremChanges>

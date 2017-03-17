@@ -336,7 +336,7 @@ public class JobDispatcherClass {
             tempJob.Job_Name = tempJob.Application + "_Script_" + tempJob.Script_ID + "_" + tempJob.Location + "_" + tempJob.Auto_Tool;
 
             //2. Save job name in the Job_Library CSV file
-            Update_CSV(tempJob.Application,tempJob.Job_Name,1,iRow_JobLibrary+1);
+            //Update_CSV(tempJob.Application,tempJob.Job_Name,1,iRow_JobLibrary+1);  ----->>>>> Hidding this step now bc need to fix method that saves everything as string
 
             //3. Create XML file under for the application job
             String XML_Path = "./build/" + tempJob.Job_Name + ".xml";
@@ -397,10 +397,149 @@ public class JobDispatcherClass {
             JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
             jenks.CreateJob(tempJob.Job_Name,XML_Path);
 
-
-
         }// end condition if job doesn't exist and is ALM
     }
+
+
+
+
+    /*
+        Method to create GitHub job based on template Jenkins config XML for ALM parameters.
+        Steps:
+            1. Define job name
+            2. Save job name in the Job_Library CSV file
+            3. Create XML file under .build/application_name folder
+            4. Populate the XML with parameters from job
+            5. Create GitHub job in Jenkins
+        Author: Fernanda Menks - March 16, 2017
+     */
+    public void Create_GitHub_Job(JobContainer tempJob, int iRow_JobLibrary) throws IOException {
+        if ( (tempJob.Job_Name.isEmpty()) && (tempJob.Location.contentEquals("GitHub"))) {
+            System.out.println("Creating GitHub job for scrip #" + tempJob.Script_ID);
+
+            //1. Define job name
+            tempJob.Job_Name = tempJob.Application + "_Script_" + tempJob.Script_ID + "_" + tempJob.Location + "_" + tempJob.Auto_Tool;
+
+            //2. Save job name in the Job_Library CSV file
+            //Update_CSV(tempJob.Application,tempJob.Job_Name,1,iRow_JobLibrary+1);  ----->>>>> Hidding this step now bc need to fix method that saves everything as string
+
+            //3. Create XML file under for the application job
+            String XML_Path = "./build/" + tempJob.Job_Name + ".xml";
+            FileWriter writer = new FileWriter(XML_Path);
+
+            //4. Populate the XML with parameters from job
+            writer.write("<?xml version='1.0' encoding='UTF-8'?>\n"+
+                        "<maven2-moduleset plugin=\"maven-plugin@2.13\">\n"+
+                        "  <actions/>\n"+
+                        "  <description>add description here...</description>\n"+
+                        "  <keepDependencies>false</keepDependencies>\n"+
+                        "  <properties>\n"+
+                        "    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin=\"github@1.19.1\">\n"+
+                        "      <projectUrl>https://github.com/TrainingSpace/Training_BDD/</projectUrl>\n"+
+                        "      <displayName></displayName>\n"+
+                        "    </com.coravy.hudson.plugins.github.GithubProjectProperty>\n"+
+                        "    <hudson.model.ParametersDefinitionProperty>\n"+
+                        "      <parameterDefinitions>\n"+
+                        "        <hudson.model.StringParameterDefinition>\n"+
+                        "          <name>FEATURE_NAME</name>\n"+
+                        "          <description></description>\n"+
+                        "          <defaultValue>&quot;&apos;src/test/features/Sample banking acceptance criteria.feature&apos;&quot;</defaultValue>\n"+
+                        "        </hudson.model.StringParameterDefinition>\n"+
+                        "      </parameterDefinitions>\n"+
+                        "    </hudson.model.ParametersDefinitionProperty>\n"+
+                        "  </properties>\n"+
+                        "  <scm class=\"hudson.plugins.git.GitSCM\" plugin=\"git@2.4.4\">\n"+
+                        "    <configVersion>2</configVersion>\n"+
+                        "    <userRemoteConfigs>\n"+
+                        "      <hudson.plugins.git.UserRemoteConfig>\n"+
+                        "        <url>https://github.com/TrainingSpace/Training_BDD.git</url>\n"+
+                        "      </hudson.plugins.git.UserRemoteConfig>\n"+
+                        "    </userRemoteConfigs>\n"+
+                        "    <branches>\n"+
+                        "      <hudson.plugins.git.BranchSpec>\n"+
+                        "        <name>*/master</name>\n"+
+                        "      </hudson.plugins.git.BranchSpec>\n"+
+                        "    </branches>\n"+
+                        "    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>\n"+
+                        "    <submoduleCfg class=\"list\"/>\n"+
+                        "    <extensions/>\n"+
+                        "  </scm>\n"+
+                        "  <assignedNode>10.0.0.1</assignedNode>\n"+
+                        "  <canRoam>false</canRoam>\n"+
+                        "  <disabled>false</disabled>\n"+
+                        "  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>\n"+
+                        "  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>\n"+
+                        "  <triggers/>\n"+
+                        "  <concurrentBuild>false</concurrentBuild>\n"+
+                        "  <rootModule>\n"+
+                        "    <groupId>com.accenture.cucumber</groupId>\n"+
+                        "    <artifactId>Training_BDD</artifactId>\n"+
+                        "  </rootModule>\n"+
+                        "  <goals>clean verify -Dcucumber.options=$FEATURE_NAME</goals>\n"+
+                        "  <aggregatorStyleBuild>true</aggregatorStyleBuild>\n"+
+                        "  <incrementalBuild>false</incrementalBuild>\n"+
+                        "  <ignoreUpstremChanges>true</ignoreUpstremChanges>\n"+
+                        "  <ignoreUnsuccessfulUpstreams>false</ignoreUnsuccessfulUpstreams>\n"+
+                        "  <archivingDisabled>false</archivingDisabled>\n"+
+                        "  <siteArchivingDisabled>false</siteArchivingDisabled>\n"+
+                        "  <fingerprintingDisabled>false</fingerprintingDisabled>\n"+
+                        "  <resolveDependencies>false</resolveDependencies>\n"+
+                        "  <processPlugins>false</processPlugins>\n"+
+                        "  <mavenValidationLevel>-1</mavenValidationLevel>\n"+
+                        "  <runHeadless>false</runHeadless>\n"+
+                        "  <disableTriggerDownstreamProjects>false</disableTriggerDownstreamProjects>\n"+
+                        "  <blockTriggerWhenBuilding>true</blockTriggerWhenBuilding>\n"+
+                        "  <settings class=\"jenkins.mvn.DefaultSettingsProvider\"/>\n"+
+                        "  <globalSettings class=\"jenkins.mvn.DefaultGlobalSettingsProvider\"/>\n"+
+                        "  <reporters/>\n"+
+                        "  <publishers>\n"+
+                        "    <htmlpublisher.HtmlPublisher plugin=\"htmlpublisher@1.11\">\n"+
+                        "      <reportTargets>\n"+
+                        "        <htmlpublisher.HtmlPublisherTarget>\n"+
+                        "          <reportName>BDD report</reportName>\n"+
+                        "          <reportDir>\\"+"target\\cucumber-htmlreport</reportDir>\n"+
+                        "          <reportFiles>index.html</reportFiles>\n"+
+                        "          <alwaysLinkToLastBuild>false</alwaysLinkToLastBuild>\n"+
+                        "          <keepAll>false</keepAll>\n"+
+                        "          <allowMissing>false</allowMissing>\n"+
+                        "        </htmlpublisher.HtmlPublisherTarget>\n"+
+                        "      </reportTargets>\n"+
+                        "    </htmlpublisher.HtmlPublisher>\n"+
+                        "    <net.masterthought.jenkins.CucumberReportPublisher plugin=\"cucumber-reports@2.6.3\">\n"+
+                        "      <jsonReportDirectory>\target</jsonReportDirectory>\n"+
+                        "      <jenkinsBasePath></jenkinsBasePath>\n"+
+                        "      <fileIncludePattern></fileIncludePattern>\n"+
+                        "      <fileExcludePattern></fileExcludePattern>\n"+
+                        "      <skippedFails>false</skippedFails>\n"+
+                        "      <pendingFails>false</pendingFails>\n"+
+                        "      <undefinedFails>false</undefinedFails>\n"+
+                        "      <missingFails>false</missingFails>\n"+
+                        "      <ignoreFailedTests>false</ignoreFailedTests>\n"+
+                        "      <parallelTesting>false</parallelTesting>\n"+
+                        "    </net.masterthought.jenkins.CucumberReportPublisher>\n"+
+                        "  </publishers>\n"+
+                        "  <buildWrappers/>\n"+
+                        "  <prebuilders/>\n"+
+                        "  <postbuilders/>\n"+
+                        "  <runPostStepsIfResult>\n"+
+                        "    <name>FAILURE</name>\n"+
+                        "    <ordinal>2</ordinal>\n"+
+                        "    <color>RED</color>\n"+
+                        "    <completeBuild>true</completeBuild>\n"+
+                        "  </runPostStepsIfResult>\n"+
+                        "</maven2-moduleset>");
+
+            writer.flush();
+            writer.close();
+
+            //5. Create ALM job in Jenkins
+            JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
+            jenks.CreateJob(tempJob.Job_Name,XML_Path);
+
+        }// end condition if job doesn't exist and is GitHub
+    }
+
+
 
     /*
         Function to create Jenkins structure for new application
@@ -492,11 +631,17 @@ public class JobDispatcherClass {
         objTemp.ReadJobLibrary(application_name);
         //1.4. Create pending jobs in the Library
         for(int i=0; i<JobLibrary.size(); i++) {
-        //for (JobContainer tempJob: (List<JobContainer>)JobLibrary){
             tempJob = JobLibrary.get(i);
-            objTemp.Create_ALM_Job(tempJob, i);
+            switch (tempJob.Location){
+                case "ALM":
+                    objTemp.Create_ALM_Job(tempJob, i);
+                    break;
 
-        }
+                case "GitHub":
+                    objTemp.Create_GitHub_Job(tempJob, i);
+                    break;
+            }// end of switch case per location
+        }// end of loop for each job in the library
 
 
 
@@ -527,8 +672,6 @@ public class JobDispatcherClass {
         Create_ALM_Job(tempJob);
     */
 
-       // objTemp.Update_CSV("Dummy","testing...",1,1);
-        //objTemp.Update_CSV("Dummy","something else",1,3);
     }
 }
 
