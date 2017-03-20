@@ -113,6 +113,17 @@ public class JenkinsCLIWrapper {
         System.out.println("Done.");
     }
 
+    public void BuildJob(String jobName, String Parameter1, String Parameter_value1, String Parameter2, String Parameter_value2) {
+        System.out.println("Building job with parameter " + jobName + "...");
+        sCommand = "cmd /c java -jar jenkins-cli.jar -s \"" + sRootURL + "\"";
+        sCommand = sCommand + " build \"" + jobName + "\"";
+        sCommand = sCommand + " -p \"" + Parameter1 + "=" + Parameter_value1 + "\"";
+        sCommand = sCommand + " -p \"" + Parameter2 + "=" + Parameter_value2 + "\"";
+        System.out.println(sCommand);
+        RunCommand(sCommand);
+        System.out.println("Done.");
+    }
+
     public void DisableJob(String jobName) {
         System.out.println("Disabling job " + jobName + "...");
         sCommand = "cmd /c java -jar jenkins-cli.jar -s \"" + sRootURL + "\"";
@@ -181,9 +192,11 @@ public class JenkinsCLIWrapper {
         System.out.println("Done.");
     }
 
+
     public static void main(String args[]) {
         JenkinsCLIWrapper jenks = new JenkinsCLIWrapper("http://localhost:8080");
-        jenks.CreateJob("C:/Program Files (x86)/Jenkins/jobs/Application_A/jobs/Job Library/jobs/XXXXX","./Template XML/Template_Maven_Job.xml");
+        //jenks.CreateJob("C:/Program Files (x86)/Jenkins/jobs/Application_A/jobs/Job Library/jobs/XXXXX","./Template XML/Template_Maven_Job.xml");
+        //jenks.CreateJob("XXXXX","./Template XML/Template_Maven_Job.xml");
         //jenks.AddJobToView("BLABLABLA", "TCoE Job Dispatcher");
         //jenks.BuildJob("SetupJenkinsStructure", "Application_Name", "xxxxxx");
         //jenks.DisableJob("TesteCLI");

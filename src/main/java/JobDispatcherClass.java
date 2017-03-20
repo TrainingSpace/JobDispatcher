@@ -396,6 +396,7 @@ public class JobDispatcherClass {
             //5. Create ALM job in Jenkins
             JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
             jenks.CreateJob(tempJob.Job_Name,XML_Path);
+            jenks.BuildJob("MoveJobIntoFolder","APPLICATION_NAME",tempJob.Application, "JOB_NAME",tempJob.Job_Name);
 
         }// end condition if job doesn't exist and is ALM
     }
@@ -431,11 +432,11 @@ public class JobDispatcherClass {
             writer.write("<?xml version='1.0' encoding='UTF-8'?>\n"+
                         "<maven2-moduleset plugin=\"maven-plugin@2.13\">\n"+
                         "  <actions/>\n"+
-                        "  <description>add description here...</description>\n"+
+                        "  <description>"+ "Pre-set job item for GitHub script ID " + tempJob.Script_ID + " | Auto tool = " + tempJob.Auto_Tool +"</description>\n"+
                         "  <keepDependencies>false</keepDependencies>\n"+
                         "  <properties>\n"+
                         "    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin=\"github@1.19.1\">\n"+
-                        "      <projectUrl>https://github.com/TrainingSpace/Training_BDD/</projectUrl>\n"+
+                        "      <projectUrl>"+tempJob.GitHub_Repository_URL+"</projectUrl>\n"+
                         "      <displayName></displayName>\n"+
                         "    </com.coravy.hudson.plugins.github.GithubProjectProperty>\n"+
                         "    <hudson.model.ParametersDefinitionProperty>\n"+
@@ -443,7 +444,7 @@ public class JobDispatcherClass {
                         "        <hudson.model.StringParameterDefinition>\n"+
                         "          <name>FEATURE_NAME</name>\n"+
                         "          <description></description>\n"+
-                        "          <defaultValue>&quot;&apos;src/test/features/Sample banking acceptance criteria.feature&apos;&quot;</defaultValue>\n"+
+                        "          <defaultValue>&quot;&apos;"+tempJob.GitHub_Feature+"&apos;&quot;</defaultValue>\n"+
                         "        </hudson.model.StringParameterDefinition>\n"+
                         "      </parameterDefinitions>\n"+
                         "    </hudson.model.ParametersDefinitionProperty>\n"+
@@ -452,7 +453,7 @@ public class JobDispatcherClass {
                         "    <configVersion>2</configVersion>\n"+
                         "    <userRemoteConfigs>\n"+
                         "      <hudson.plugins.git.UserRemoteConfig>\n"+
-                        "        <url>https://github.com/TrainingSpace/Training_BDD.git</url>\n"+
+                        "        <url>"+tempJob.GitHub_Repository_URL+".git</url>\n"+
                         "      </hudson.plugins.git.UserRemoteConfig>\n"+
                         "    </userRemoteConfigs>\n"+
                         "    <branches>\n"+
@@ -535,6 +536,7 @@ public class JobDispatcherClass {
             //5. Create ALM job in Jenkins
             JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
             jenks.CreateJob(tempJob.Job_Name,XML_Path);
+            jenks.BuildJob("MoveJobIntoFolder","APPLICATION_NAME",tempJob.Application, "JOB_NAME",tempJob.Job_Name);
 
         }// end condition if job doesn't exist and is GitHub
     }
@@ -542,12 +544,14 @@ public class JobDispatcherClass {
 
 
     /*
-        Function to create Jenkins structure for new application
+        Function to create Jenkins structure for new application (original version) + setup job that allows move jobs into folders (enhancement #1)
         Author: Fernanda Menks - Mar 14, 2017
+        Enhancement: Fernanda Menks - Mar 20, 2017
     */
     public void InitiateJenkinsStructure(){
         JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
         jenks.CreateJob("SetupJenkinsStructure","./Template XML/Template_SetupJenkinsStructure.xml");
+        jenks.CreateJob("MoveJobIntoFolder","./Template XML/Template_MoveJobIntoFolder.xml");
     }
 
     /*
@@ -624,7 +628,7 @@ public class JobDispatcherClass {
         //1.1. Setup initial Jenkins structure
         objTemp.InitiateJenkinsStructure();
         //1.2. Add new applications in Jenkins view
-        application_name = "Dummy";
+        application_name = "Application_A";
         objTemp.addApplicationInJenkins(application_name);
         //1.3. Check if there are new jobs to load into Jobs Library
         objTemp.Merge_New_Auto_Scope_into_Library(application_name);
@@ -653,23 +657,10 @@ public class JobDispatcherClass {
             System.out.println(i+1 + ") "+ IDs.get(i));
         }
 
-        //2. Merge new auto scope into pre-set job library
-        tempCSVcontent = objTemp.Merge_New_Auto_Scope_into_Library("Application_A");
-        System.out.println("\n\nTotal lines in Job Library CSV file = " + tempCSVcontent.size());
-        for(String line : tempCSVcontent){
-            System.out.println(line);
-        }
-
-        //3. Scan all jobs in the library AFTER merge
-        objTemp.ReadJobLibrary("Application_A");
-        System.out.println("\n\nTotal jobs objects in library = " + JobLibrary.size());
 
         //4. Generate results CSV file
         objTemp.Export_Execution_Results("Application_A");
 
-        //5. Create ALM job based on template
-        tempJob = JobLibrary.get(4);
-        Create_ALM_Job(tempJob);
     */
 
     }
