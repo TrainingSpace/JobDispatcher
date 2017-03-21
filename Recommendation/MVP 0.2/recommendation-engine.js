@@ -12,6 +12,34 @@ $(document).ready(function(){
 	
 	var result = '';
 	
+	//Get System Current Date
+	var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+
+	var currentDate = new Date();		
+	var currentMonth = monthNames[currentDate.getMonth()];
+	var currentYear = currentDate.getFullYear();
+	
+	var orgReqFile = []; //original requirement csv file
+	var orgScriptsCsvFile = []; //original scripts csv file
+	var orgExecutionCsvFile = []; //original execution csv file
+	
+	/* Question 1 variables - New Features working */
+	var q1CurrentMonthReqIds = []; //ReqIds from the reqs csv		
+	var q1CurrentMonthScriptIds = '';  //used for final csv export		
+	var finalScriptHeadr = '';
+	
+	/* Question 2 Variables - Did I break anything */	
+	var q2PastMonthReqIds = []; //ReqIds from the reqs csv		
+	var finalExecIds = []; //scriptIds from theexecution csv with status passed	
+	var q2PastMonthScriptIds = '';  //used for final csv export	
+	var q2JobListScriptIds = '';
+	var q2JobListHeader = '';
+	
+	/* Question 3 Variables - How stable are top priority defects */		
+	var orgDefectsCsvFile = []; //original execution csv file
+	
+	var questionsVal = '';
+	
 	$('#questions').change(function() {
 		
 		//alert('The option with value ' + $(this).val() + ' was selected.');
@@ -28,6 +56,12 @@ $(document).ready(function(){
 		$('#exportScriptsIdData').hide();
 		$('#answersContainer').hide();
 		//alert('question selected === ' + $("#questions option:selected").text() );
+		q1CurrentMonthReqIds = [];
+		q1CurrentMonthScriptIds = '';
+		
+		q2PastMonthReqIds = [];
+		q2JobListScriptIds = '';
+		finalExecIds = [];
 		
 		if (questionsVal == 'q1') {				
 			$('#ReqsContainer').show();
@@ -36,15 +70,11 @@ $(document).ready(function(){
 			
 		} else if (questionsVal == 'q2') {
 			result = '';
-			/*$('#reqfiles').val(''); 
-			$('#scriptfiles').val(''); 
-			$('#executionfiles').val('');
-			$('#resultContainer').empty();*/
 			$('#ReqsContainer').show();
 			$('#scriptsContainer').show();
 			$('#execContainer').show();
 			$('#exportScriptsIdData').show();	
-			
+						
 		}  else if (questionsVal == 'q3') {	
 			result = '';
 			$('#ReqsContainer').show();
@@ -60,38 +90,20 @@ $(document).ready(function(){
       //  $('#threshold').val(""); // Should set the value to nothing.
     //});
 	
-	//Get System Current Date
-	var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
-
-	var currentDate = new Date();		
-	var currentMonth = monthNames[currentDate.getMonth()];
-	var currentYear = currentDate.getFullYear();
 	
-	/* Question 1 variables - New Features working */	
-	var orgReqFile = []; //original requirement csv file
-	var orgScriptsCsvFile = []; //original scripts csv file
-			
-	var finalReqIds = []; //ReqIds from the reqs csv		
-	var finalScriptIds = '';  //used for final csv export		
-	var finalScriptHeadr = '';
-	
-	/* Question 2 Variables - Did I break anything */		
-	var orgExecutionCsvFile = []; //original execution csv file
-	var finalExecIds = []; //scriptIds from theexecution csv with status passed	
-	var q2JobList = '';
-	var q2JobListHeader = '';
-	
-	/* Question 3 Variables - How stable are top priority defects */		
-	var orgDefectsCsvFile = []; //original execution csv file
-	
-	var questionsVal = '';
 	
 	//Event Listener to select requirements
 	document.getElementById('reqfiles').addEventListener('change', selectReqs, false);
 			
 	function selectReqs(evt) {		
 		var orgReqFiles = evt.target.files; // FileList object
-		orgReqFile = orgReqFiles[0];				
+		orgReqFile = orgReqFiles[0];	
+
+		if (questionsVal == 'q1') {	
+			getQ1CurrentMonthReqsId(orgReqFile);
+		} else if (questionsVal == 'q2') {
+			getQ2PastMonthsReqsId(orgReqFile);
+		}
 	}		
 	
 	//Event Listener to select scripts
@@ -100,6 +112,12 @@ $(document).ready(function(){
 	function selectScripts(evt) {
 		var orgScriptsCsvFiles = evt.target.files; // FileList object
 		orgScriptsCsvFile = orgScriptsCsvFiles[0];
+		
+		if (questionsVal == 'q1') {	
+			getQ1NewFeaturesJobIds(orgScriptsCsvFile);
+		} else if (questionsVal == 'q2') {
+			getQ2ScriptIds(orgScriptsCsvFile);			
+		}
 
 	}
 	
@@ -109,6 +127,10 @@ $(document).ready(function(){
 	function selectExecutionScripts(evt) {
 		var orgExecutionCsvFiles = evt.target.files; // FileList object
 		orgExecutionCsvFile = orgExecutionCsvFiles[0];
+		
+		if (questionsVal == 'q2') {
+			getQ2ExecutionIds(orgExecutionCsvFile);				
+		}
 
 	}
 	
@@ -122,7 +144,7 @@ $(document).ready(function(){
 	}
 	
 	//Get the list of new requirement Ids based on current month
-	function getNewReqsId(orgReqFile) {
+	function getQ1CurrentMonthReqsId(orgReqFile) {
 		
 		var reader = new FileReader();
 		reader.readAsText(orgReqFile);
@@ -146,14 +168,14 @@ $(document).ready(function(){
 				
 				if (reqsCreationYear == currentYear) {
 					if (reqsCreationMonth == currentMonth) {
-						finalReqIds[j]	= orgReqsdata[0];
+						q1CurrentMonthReqIds[j]	= orgReqsdata[0];
 						j++;
 					}					
 				}
 								
 			}
 		
-			alert('Req Ids with current month =' + finalReqIds);
+			alert('Req Ids with current month =' + q1CurrentMonthReqIds);
 		
 		}
 		
@@ -162,7 +184,7 @@ $(document).ready(function(){
 	}
 	
 	//Get the consolidated list of script IDs based on current month and new requirements
-	function getNewFeaturesJobIds(orgScriptsCsvFile) {
+	function getQ1NewFeaturesJobIds(orgScriptsCsvFile) {
 		var reader = new FileReader();
 		reader.readAsText(orgScriptsCsvFile);
 		reader.onload = function(event){
@@ -170,7 +192,7 @@ $(document).ready(function(){
 			var orgScriptsdata = $.csv.toArrays(orgScriptCsv);			
 			var html = '';
 			
-			//alert(finalReqIds);
+			//alert(q1CurrentMonthReqIds);
 						
 			//output the column data
 			
@@ -178,10 +200,10 @@ $(document).ready(function(){
 			var headers = rows[0].split(',');
 			
 			
-			//var finalScriptIds = '';
+			//var q1CurrentMonthScriptIds = '';
 			
 			finalScriptHeadr = headers[0];
-					
+			//alert(finalScriptHeadr);		
 					
 			//Output the column values
 			for (var i=1; i<rows.length; i++) {
@@ -199,11 +221,12 @@ $(document).ready(function(){
 				
 				creationYear = creationDate.getFullYear();
 				
-				if (testType == "auto") {
-					for(var j=0; j<finalReqIds.length; j++){
-						if(orgScriptsdata[3] == finalReqIds[j]){
+				if (testType.toLowerCase() == "auto") {
+					//alert(testType.toLowerCase());
+					for(var j=0; j<q1CurrentMonthReqIds.length; j++){
+						if(orgScriptsdata[3] == q1CurrentMonthReqIds[j]){
 							flag = true;
-							//alert('reqid flag =' + orgScriptsdata[0] + finalReqIds[j] + flag);							
+							//alert('reqid flag =' + orgScriptsdata[0] + q1CurrentMonthReqIds[j] + flag);							
 						}						
 					}	
 					if (flag == false){
@@ -214,20 +237,129 @@ $(document).ready(function(){
 						}
 					}
 					if (flag == true) {
-						if (finalScriptIds == '') {
-							finalScriptIds += orgScriptsdata[0];
+						if (q1CurrentMonthScriptIds == '') {
+							q1CurrentMonthScriptIds += orgScriptsdata[0];
 						} else {
-							finalScriptIds += '\n' + orgScriptsdata[0] ;
+							q1CurrentMonthScriptIds += '\n' + orgScriptsdata[0] ;
 						}
 					}
 				}		
 								
 			}
 			
-			finalScriptIds = finalScriptHeadr + '\n' + finalScriptIds;
+			q1CurrentMonthScriptIds = finalScriptHeadr + '\n' + q1CurrentMonthScriptIds;
 		
-			alert('Final Script Ids === ' + '\n' + finalScriptIds);		
-			$('#jobTable').html(html);	
+			alert('Final Script Ids === ' + '\n' + q1CurrentMonthScriptIds);	
+		
+		};
+	  reader.onerror = function(){ alert('Unable to read ' + orgScriptsCsvFile.fileName); };
+			  
+	}
+	
+	function getQ2PastMonthsReqsId(orgReqFile) {
+		
+		var reader = new FileReader();
+		reader.readAsText(orgReqFile);
+		reader.onload = function(event){
+					
+			var orgReqsCsv = event.target.result;
+				
+			var rows = orgReqsCsv.split("\n");
+			var headers = rows[0].split(',');
+			var j=0;
+												
+			//Output the column values
+			for (var i=1; i<rows.length; i++) {
+				
+				var orgReqsdata = rows[i].split(',');
+				
+				var reqsCreationDate = new Date(orgReqsdata[2]);
+				locale = "en-us",
+				reqsCreationMonth = reqsCreationDate.toLocaleString(locale, { month: "long" });	
+				reqsCreationYear = reqsCreationDate.getFullYear();
+				
+				if (reqsCreationYear == currentYear) {
+					if (reqsCreationMonth != currentMonth) {
+						q2PastMonthReqIds[j]	= orgReqsdata[0];
+						j++;
+					}					
+				}
+								
+			}
+		
+			alert('Req Ids with past month ===' + q2PastMonthReqIds);
+		
+		}
+		
+		reader.onerror = function(){ alert('Unable to read ' + orgReqFile.fileName); };
+					
+	}
+	
+	function getQ2ScriptIds(orgScriptsCsvFile) {
+		var reader = new FileReader();
+		reader.readAsText(orgScriptsCsvFile);
+		reader.onload = function(event){
+			var orgScriptCsv = event.target.result;
+			var orgScriptsdata = $.csv.toArrays(orgScriptCsv);			
+			var html = '';
+			
+			//alert(q2PastMonthReqIds);
+						
+			//output the column data
+			
+			var rows = orgScriptCsv.split("\n");
+			var headers = rows[0].split(',');
+			
+			
+			//var q2PastMonthScriptIds = '';
+			
+			finalScriptHeadr = headers[0];
+					
+					
+			//Output the column values
+			for (var i=1; i<rows.length; i++) {
+				
+				var flag = false;
+				
+				var orgScriptsdata = rows[i].split(',');
+				
+				var testType = testType = orgScriptsdata[1];
+								
+				var creationDate = new Date(orgScriptsdata[4]);
+				locale = "en-us",
+				creationMonth = creationDate.toLocaleString(locale, { month: "long" });	
+				
+				creationYear = creationDate.getFullYear();
+				
+				
+				if (testType.toLowerCase() == "auto") {
+					for(var j=0; j<q2PastMonthReqIds.length; j++){
+						if(orgScriptsdata[3] == q2PastMonthReqIds[j]){
+							flag = true;
+							//alert('reqid flag =' + orgScriptsdata[0] + q2PastMonthReqIds[j] + flag);							
+						}						
+					}	
+					if (flag == false){
+						if (creationYear == currentYear) {
+							if (creationMonth != currentMonth) {
+								flag = true;
+							}
+						}
+					}
+					if (flag == true) {
+						if (q2PastMonthScriptIds == '') {
+							q2PastMonthScriptIds += orgScriptsdata[0];
+						} else {
+							q2PastMonthScriptIds += '\n' + orgScriptsdata[0] ;
+						}
+					}
+				}		
+								
+			}
+			
+			q2PastMonthScriptIds = finalScriptHeadr + '\n' + q2PastMonthScriptIds;
+		
+			alert('Final Q1 Script Ids less than current month === ' + '\n' + q2PastMonthScriptIds);	
 		
 		};
 	  reader.onerror = function(){ alert('Unable to read ' + orgScriptsCsvFile.fileName); };
@@ -264,27 +396,27 @@ $(document).ready(function(){
 				}	
 			}			
 			//alert('Execution Ids with status passed =' + finalExecIds);
-			//alert('Final Script Ids === ' + '\n' + finalScriptIds);
+			//alert('Final Script Ids === ' + '\n' + q2PastMonthScriptIds);
 			
-			var scriptIdArray = finalScriptIds.split('\n');
+			var scriptIdArray = q2PastMonthScriptIds.split('\n');
 			q2JobListHeader = scriptIdArray[0];
 			
 			for(var i=1; i<scriptIdArray.length; i++){
 				for (var j=0; j<finalExecIds.length; j++) {
 					if(scriptIdArray[i] == finalExecIds[j]){
 						if (scriptIdArray == '') {
-							q2JobList = scriptIdArray[i];
+							q2JobListScriptIds = scriptIdArray[i];
 						} else {
-							q2JobList += '\n' +  scriptIdArray[i];
+							q2JobListScriptIds += '\n' +  scriptIdArray[i];
 						}
-						//q2JobList = scriptIdArray[i];
-						//alert('success ===' + q2JobList);												
+						//q2JobListScriptIds = scriptIdArray[i];
+						//alert('success ===' + q2JobListScriptIds);												
 					}	
 				}
 			}	
 			
-			q2JobList = q2JobListHeader + q2JobList;				
-			alert(q2JobList);	
+			q2JobListScriptIds = q2JobListHeader + q2JobListScriptIds;				
+			alert('Q2 Script Ids with status passed === ' + '\n' + q2JobListScriptIds);	
 			
 		}						
 	}
@@ -293,45 +425,25 @@ $(document).ready(function(){
 		$( "#datepicker" ).datepicker();
 	});
 	
-	
-	$(".exportScriptsIdData").on('click', function(event) {
 			
-		if (questionsVal == ''){
-			alert('Please select an option from the questions dropdown');
-			
-		} else if (questionsVal == 'q1') {	
-			getNewReqsId(orgReqFile);
-			getNewFeaturesJobIds(orgScriptsCsvFile);	
-			$('#answersContainer').show();	
-			
-		} else if (questionsVal == 'q2') {				
-			getNewReqsId(orgReqFile);
-			getNewFeaturesJobIds(orgScriptsCsvFile);
-			getQ2ExecutionIds(orgExecutionCsvFile);	
-			$('#answersContainer').show();	
-			
-		} else if (questionsVal == 'q3') {				
-			getHighPriorityDefectsId(orgScriptsCsvFile);
-			$('#answersContainer').show();	
-			
-		} 		
-	});
-	
 	$(".downloadJobListData").on('click', function(event) {
 		if (questionsVal == ''){
 			alert('Please select an option from the questions dropdown');
 			
 		} else if (questionsVal == 'q1') {	
-			var args = [finalScriptIds, 'JobIDs.csv'];			
+			var args = [q1CurrentMonthScriptIds, 'JobIDs.csv'];			
 			exportScriptIdsToCSV.apply(this, args);
+			$('#answersContainer').show();
 			
 		} else if (questionsVal == 'q2') {				
-			var args = [q2JobList, 'JobIDs.csv'];			
+			var args = [q2JobListScriptIds, 'JobIDs.csv'];			
 			exportScriptIdsToCSV.apply(this, args);
+			$('#answersContainer').show();
 			
 		} else if (questionsVal == 'q3') {				
 			var args = [finalScriptIds, 'JobIDs.csv'];			
 			exportScriptIdsToCSV.apply(this, args);
+			$('#answersContainer').show();
 			
 		} 		
 			
