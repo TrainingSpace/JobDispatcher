@@ -16,6 +16,7 @@ public class JobDispatcherClass {
     public static List<String> IDs = new ArrayList<String>(); // List of job IDs in the recommendation file
     public static List<JobContainer> JobLibrary = new ArrayList<>(); // List of jobs listed in the library for a particular application
     public static String Jenkins_URL = "http://localhost:8080/";
+    public static String Application_Name = "Application_A"; // initialized with sample application
 
     //ALM specific config info
     public static String ALM_Server_Name = "ALM_Server_Name_From_Jenkins_Config"; // ALM server name listed in Jenkins server configuration
@@ -548,7 +549,7 @@ public class JobDispatcherClass {
         Author: Fernanda Menks - Mar 14, 2017
         Enhancement: Fernanda Menks - Mar 20, 2017
     */
-    public void InitiateJenkinsStructure(){
+    public static void InitiateJenkinsStructure(){
         JenkinsCLIWrapper jenks = new JenkinsCLIWrapper(Jenkins_URL);
         jenks.CreateJob("SetupJenkinsStructure","./Template XML/Template_SetupJenkinsStructure.xml");
         jenks.CreateJob("MoveJobIntoFolder","./Template XML/Template_MoveJobIntoFolder.xml");
@@ -611,6 +612,31 @@ public class JobDispatcherClass {
     }
 
 
+    public void PreSetJobLibrary() throws IOException {
+        JobContainer tempJob = new JobContainer();
+
+        //1.1. Setup initial Jenkins structure
+        InitiateJenkinsStructure();
+        //1.2. Add new applications in Jenkins view
+        addApplicationInJenkins(Application_Name);
+        //1.3. Check if there are new jobs to load into Jobs Library
+        Merge_New_Auto_Scope_into_Library(Application_Name);
+        ReadJobLibrary(Application_Name);
+        //1.4. Create pending jobs in the Library
+        for(int i=0; i<JobLibrary.size(); i++) {
+            tempJob = JobLibrary.get(i);
+            switch (tempJob.Location){
+                case "ALM":
+                    Create_ALM_Job(tempJob, i);
+                    break;
+
+                case "GitHub":
+                    Create_GitHub_Job(tempJob, i);
+                    break;
+            }// end of switch case per location
+        }// end of loop for each job in the library
+    }
+
     /*
         Main function to list all CSV files read in console output.
         This method isn't used in the real job creation. This is just for debug purposes.
@@ -618,51 +644,16 @@ public class JobDispatcherClass {
         Author: Fernanda Menks - Feb 20, 2017
      */
     public static void main(String[] args) throws IOException {
-        List<String> tempCSVcontent = new ArrayList<String>();
         JobDispatcherClass objTemp = new JobDispatcherClass();
-        JobContainer tempJob = new JobContainer();
-        String application_name = "";
-
 
         //1. Pre-set Jobs Library
-        //1.1. Setup initial Jenkins structure
-        objTemp.InitiateJenkinsStructure();
-        //1.2. Add new applications in Jenkins view
-        application_name = "Application_A";
-        objTemp.addApplicationInJenkins(application_name);
-        //1.3. Check if there are new jobs to load into Jobs Library
-        objTemp.Merge_New_Auto_Scope_into_Library(application_name);
-        objTemp.ReadJobLibrary(application_name);
-        //1.4. Create pending jobs in the Library
-        for(int i=0; i<JobLibrary.size(); i++) {
-            tempJob = JobLibrary.get(i);
-            switch (tempJob.Location){
-                case "ALM":
-                    objTemp.Create_ALM_Job(tempJob, i);
-                    break;
+        Application_Name = "Application_A";
+        objTemp.PreSetJobLibrary();
 
-                case "GitHub":
-                    objTemp.Create_GitHub_Job(tempJob, i);
-                    break;
-            }// end of switch case per location
-        }// end of loop for each job in the library
-
-
-
-     /*
-        //1. List input file with recommended job IDs
-        objTemp.ReadScriptIDs("Application_A");
-        System.out.println("Total Scripts in recommendation list = " + iTotalJobIDs);
-        for(int i=0; i<iTotalJobIDs; i++){
-            System.out.println(i+1 + ") "+ IDs.get(i));
-        }
 
 
         //4. Generate results CSV file
-        objTemp.Export_Execution_Results("Application_A");
-
-    */
-
+        objTemp.Export_Execution_Results(Application_Name);
     }
 }
 
