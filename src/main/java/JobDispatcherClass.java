@@ -603,7 +603,7 @@ public class JobDispatcherClass {
         reader.close();
 
         //write the updated CSV out
-        CSVWriter writer = new CSVWriter(new FileWriter(output));
+        CSVWriter writer = new CSVWriter(new FileWriter(output), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER);
         writer.writeAll(csvBody);
         writer.flush();
         writer.close();
