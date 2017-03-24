@@ -19,9 +19,10 @@ public class JobDispatcherClass {
     public static String Application_Name = "Application_A"; // initialized with sample application
 
     //ALM specific config info
-    public static String ALM_Server_Name = "ALM_Server_Name_From_Jenkins_Config"; // ALM server name listed in Jenkins server configuration
+    public static String ALM_Server_Name = "ALM_DEV"; // ALM server name listed in Jenkins server configuration
     public static String ALM_Username    = "coelf003";    // ALM user who can connect into ALM project where the job is located
-    public static String ALM_Password    = "{AQAAABAAAAAQ6zNBkrfEAu5SrK6+XEp/BbzVuWj5myeHT3J/b1NkoZg=}";    // ALM user password to connect into ALM project to execute auto scripts
+    //public static String ALM_Password    = "{AQAAABAAAAAQ6zNBkrfEAu5SrK6+XEp/BbzVuWj5myeHT3J/b1NkoZg=}";    // ALM user password to connect into ALM project to execute auto scripts
+    public static String ALM_Password    = "{AQAAABAAAAAQV4Fg5sKk1BDU7agQ7E2SSCanbh2iBfKkxCUFVzNLD3g=}";    // ALM DEV
 
 
 
@@ -37,8 +38,8 @@ public class JobDispatcherClass {
 
         Author: Fernanda Menks - Feb 20, 2017
      */
-    public List<String> ReadScriptIDs(String ApplicationFolder){
-        String csvFile = "./CSVs/"+ApplicationFolder+"/JobIDs.csv";
+    public List<String> ReadScriptIDs(){
+        String csvFile = "./CSVs/"+Application_Name+"/JobIDs.csv";
         BufferedReader br = null;
         String line = "\n";
         String cvsSplitBy = ",";
@@ -263,8 +264,8 @@ public class JobDispatcherClass {
 
         Author: Fernanda Menks - Mar 1, 2017
      */
-    public void Export_Execution_Results(String ApplicationFolder) throws IOException {
-        String csvFile = "./CSVs/"+ApplicationFolder+"/Execution_Result.csv";
+    public void Export_Execution_Results() throws IOException {
+        String csvFile = "./CSVs/"+Application_Name+"/Execution_Result.csv";
         FileWriter writer = new FileWriter(csvFile);
         String ID = "";
         String Exec_Status = "";
@@ -650,10 +651,11 @@ public class JobDispatcherClass {
         Application_Name = "DEV_Sample";
         objTemp.PreSetJobLibrary();
 
+        //2. Crate and execute Pipeline
+        objTemp.ReadScriptIDs();
 
-
-        //4. Generate results CSV file
-        objTemp.Export_Execution_Results(Application_Name);
+        //3. Generate results CSV file
+        objTemp.Export_Execution_Results();
     }
 }
 
