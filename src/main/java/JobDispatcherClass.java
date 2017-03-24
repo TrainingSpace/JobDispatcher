@@ -508,7 +508,7 @@ public class JobDispatcherClass {
                         "      </reportTargets>\n"+
                         "    </htmlpublisher.HtmlPublisher>\n"+
                         "    <net.masterthought.jenkins.CucumberReportPublisher plugin=\"cucumber-reports@2.6.3\">\n"+
-                        "      <jsonReportDirectory>\target</jsonReportDirectory>\n"+
+                        "      <jsonReportDirectory>\\target</jsonReportDirectory>\n"+
                         "      <jenkinsBasePath></jenkinsBasePath>\n"+
                         "      <fileIncludePattern></fileIncludePattern>\n"+
                         "      <fileExcludePattern></fileExcludePattern>\n"+
@@ -647,7 +647,7 @@ public class JobDispatcherClass {
         JobDispatcherClass objTemp = new JobDispatcherClass();
 
         //1. Pre-set Jobs Library
-        Application_Name = "Application_A";
+        Application_Name = "DEV_Sample";
         objTemp.PreSetJobLibrary();
 
 
