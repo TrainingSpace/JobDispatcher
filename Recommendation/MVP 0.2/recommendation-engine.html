@@ -2,7 +2,7 @@
 <html>
 <head>
 <!-- Author: Tharani Sivanandam @Feb 22, 2017  -->
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<!--<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">-->
 <style>
 	a.exportReqsTableData,
 	a.exportReqsTableData:visited {
@@ -38,7 +38,7 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <script src="recommendation-engine.js"></script>
- 
+
 </head>
 
 
@@ -117,15 +117,17 @@
 	<div id="answersContainer">
 		<p>Cut-over Date: <input type="text" id="datepicker">
 		Threshold %: <input type="text" name="threshold" id="threshold" value="">
-		</p>	
-		Click here to view the <a href="#" class="answers">recommendation</a>		
+		</p>		
 		<hr />
 	</div>
-	<!--<button value="Answer" id="anwsers">Answers</button>-->
+		
+	<input type="button" id="finalanswers" value="Calculate">
+	<hr />
+	
 	<div id="resultContainer">
+		
 	</div>
-
-
+	
 	</font>
 
 	<form action="javascript:alert('Hello there, I am calculating');" method="post">
