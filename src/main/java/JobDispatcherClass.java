@@ -15,14 +15,14 @@ public class JobDispatcherClass {
     public static int iExecutionRunID; // ID of the execution run currently in place
     public static List<String> IDs = new ArrayList<String>(); // List of job IDs in the recommendation file
     public static List<JobContainer> JobLibrary = new ArrayList<>(); // List of jobs listed in the library for a particular application
-    public static String Jenkins_URL = "http://localhost:8080/";
+    public static String Jenkins_URL = "http://jenkins-tcoe-qa.disney.com/"; //http://localhost:8080/";
     public static String Application_Name = "Application_A"; // initialized with sample application
 
     //ALM specific config info
-    public static String ALM_Server_Name = "ALM_DEV"; // ALM server name listed in Jenkins server configuration
+    public static String ALM_Server_Name = "PRD"; // ALM server name listed in Jenkins server configuration
     public static String ALM_Username    = "coelf003";    // ALM user who can connect into ALM project where the job is located
     //public static String ALM_Password    = "{AQAAABAAAAAQ6zNBkrfEAu5SrK6+XEp/BbzVuWj5myeHT3J/b1NkoZg=}";    // ALM user password to connect into ALM project to execute auto scripts
-    public static String ALM_Password    = "{AQAAABAAAAAQV4Fg5sKk1BDU7agQ7E2SSCanbh2iBfKkxCUFVzNLD3g=}";    // ALM DEV
+    public static String ALM_Password    = "{AQAAABAAAAAQW/sm7kSd0hHws79tJMstZ7mV0gTpbW+1ViSNSLszIPo=}";    // ALM DEV
 
 
 
@@ -263,9 +263,10 @@ public class JobDispatcherClass {
             13          Passed
 
         Author: Fernanda Menks - Mar 1, 2017
+        Update: Changed name of the CSV file to lower case as per Tharani Sivanandam  | Fernanda Menks - Mar 29, 2017
      */
     public void Export_Execution_Results() throws IOException {
-        String csvFile = "./CSVs/"+Application_Name+"/Execution_Result.csv";
+        String csvFile = "./CSVs/"+Application_Name+"/execution_result.csv";
         FileWriter writer = new FileWriter(csvFile);
         String ID = "";
         String Exec_Status = "";
@@ -338,7 +339,7 @@ public class JobDispatcherClass {
             tempJob.Job_Name = tempJob.Application + "_Script_" + tempJob.Script_ID + "_" + tempJob.Location + "_" + tempJob.Auto_Tool;
 
             //2. Save job name in the Job_Library CSV file
-            //Update_CSV(tempJob.Application,tempJob.Job_Name,1,iRow_JobLibrary+1);  ----->>>>> Hidding this step now bc need to fix method that saves everything as string
+            Update_CSV(tempJob.Application,tempJob.Job_Name,1,iRow_JobLibrary+1); // ----->>>>> Hidding this step now bc need to fix method that saves everything as string
 
             //3. Create XML file under for the application job
             String XML_Path = "./build/" + tempJob.Job_Name + ".xml";
@@ -424,7 +425,7 @@ public class JobDispatcherClass {
             tempJob.Job_Name = tempJob.Application + "_Script_" + tempJob.Script_ID + "_" + tempJob.Location + "_" + tempJob.Auto_Tool;
 
             //2. Save job name in the Job_Library CSV file
-            //Update_CSV(tempJob.Application,tempJob.Job_Name,1,iRow_JobLibrary+1);  ----->>>>> Hidding this step now bc need to fix method that saves everything as string
+            Update_CSV(tempJob.Application,tempJob.Job_Name,1,iRow_JobLibrary+1);  //----->>>>> Hidding this step now bc need to fix method that saves everything as string
 
             //3. Create XML file under for the application job
             String XML_Path = "./build/" + tempJob.Job_Name + ".xml";
@@ -648,7 +649,7 @@ public class JobDispatcherClass {
         JobDispatcherClass objTemp = new JobDispatcherClass();
 
         //1. Pre-set Jobs Library
-        Application_Name = "DEV_Sample";
+        Application_Name = "Application_A";
         objTemp.PreSetJobLibrary();
 
         //2. Crate and execute Pipeline
@@ -656,6 +657,7 @@ public class JobDispatcherClass {
 
         //3. Generate results CSV file
         objTemp.Export_Execution_Results();
+
     }
 }
 
