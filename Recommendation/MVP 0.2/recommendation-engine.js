@@ -9,6 +9,8 @@ $(document).ready(function(){
 	$('#defectsContainer').hide();
 	$('#exportScriptsIdData').hide();
 	$('#answersContainer').hide();
+	$('#finalanswers').hide();
+	$('#calculate').hide();	
 	
 	var result = '';
 	
@@ -38,7 +40,20 @@ $(document).ready(function(){
 	/* Question 3 Variables - How stable are top priority defects */		
 	var orgDefectsCsvFile = []; //original execution csv file
 	
+	
+	/* Results Container */
+	var finalPassedIds = []; //Final scriptIds from the job results csv with status passed	
+	var finalFailedIds = []; //Final scriptIds from the job results csv with status failed	
+	
 	var questionsVal = '';
+	
+	var application_name = '';
+	
+	$('#application').change(function() {
+		//application_name = $(this).val();
+		application_name = $("#application option:selected").text();
+		//alert('application selected === ' + $("#application option:selected").text() );
+	});	
 	
 	$('#questions').change(function() {
 		
@@ -86,12 +101,7 @@ $(document).ready(function(){
 
 	});
 	
-	//$('#threshold').change(function() {
-      //  $('#threshold').val(""); // Should set the value to nothing.
-    //});
-	
-	
-	
+		
 	//Event Listener to select requirements
 	document.getElementById('reqfiles').addEventListener('change', selectReqs, false);
 			
@@ -197,6 +207,8 @@ $(document).ready(function(){
 			//output the column data
 			
 			var rows = orgScriptCsv.split("\n");
+			//alert('rows==' + rows);
+								
 			var headers = rows[0].split(',');
 			
 			
@@ -434,17 +446,22 @@ $(document).ready(function(){
 			var args = [q1CurrentMonthScriptIds, 'JobIDs.csv'];			
 			exportScriptIdsToCSV.apply(this, args);
 			$('#answersContainer').show();
+			$('#finalanswers').show();	
+			$('#calculate').show();	
 			
 		} else if (questionsVal == 'q2') {				
 			var args = [q2JobListScriptIds, 'JobIDs.csv'];			
 			exportScriptIdsToCSV.apply(this, args);
 			$('#answersContainer').show();
+			$('#finalanswers').show();	
+			$('#calculate').show();	
 			
 		} else if (questionsVal == 'q3') {				
 			var args = [finalScriptIds, 'JobIDs.csv'];			
 			exportScriptIdsToCSV.apply(this, args);
 			$('#answersContainer').show();
-			
+			$('#finalanswers').show();	
+			$('#calculate').show();	
 		} 		
 			
 	});
@@ -522,5 +539,82 @@ $(document).ready(function(){
 			});
 		}
 	}
+	
+	
+	$('#finalanswers').on('click', function(event) {	
+		
+		alert('application_name==' + application_name);
+		//var fileurl = '/CSVs/' + application_name + '/execution_result.csv';
+		//fileurl = "'"+fileurl+"'";
+		//alert('fileurl==' + fileurl);
+		//$.get(fileurl, function(data) {
+		
+		$.get('/CSVs/SAP/execution_result.csv', function(data) {
 			
+			//alert(data);
+			
+			var rows = data.split("\n");
+			var headers = rows[0].split(',');
+			
+			var j=0;
+			var k=0;					
+			
+			//Output the column values
+			for (var i=0; i<rows.length; i++) {
+				
+				var orgResultsdata = rows[i].split(',');					
+				var execStatus = orgResultsdata[1].toLowerCase();
+				
+				//alert(execStatus);
+				
+				if (execStatus.trim() == "passed") {
+					finalPassedIds[j]	= orgResultsdata[0];
+					j++;
+				} 
+				
+				if (execStatus.trim() == "failed") {
+					finalFailedIds[k]	= orgResultsdata[0];
+					k++;
+				}
+			}
+			
+			var totalScripts = rows.length - 1;
+			//alert("Total no: of scripts executed ==" + totalScripts);
+			
+			//alert('Execution Ids with status passed =' + finalPassedIds);
+			//alert('Total script Ids with status passed =' + finalPassedIds.length);
+			
+			var percentagePassed = (finalPassedIds.length/totalScripts)*100;
+			//alert('Percentage passed =' + percentagePassed);
+			
+			//alert('Execution Ids with status failed =' + finalFailedIds);
+			//alert('Total script Ids with status failed =' + finalFailedIds.length);
+			
+			var percentageFailed = (finalFailedIds.length/totalScripts)*100;
+			//alert('Percentage failed =' + percentageFailed);
+			
+			var thereshold = $("#threshold").val(); 
+			//alert('thereshold entered==' + thereshold);
+			
+			var recommendation = '';
+			
+			if (percentagePassed >= thereshold) {
+				//alert ('recommendation is YES');
+				recommendation = "YES";
+			} else {
+				//alert ('recommendation is NO');
+				recommendation = "NO";
+			}
+			
+			var result = 'Total No: of scripts executed = ' + totalScripts + '<br>';
+			result += '% passed = ' + percentagePassed + '<br>';
+			result += '% failed = ' + percentageFailed + '<br>';
+			result += 'Recommendation: ' + recommendation;
+			
+			$( "#resultContainer" ).append( result );
+			$('#resultContainer').show();
+			
+		});
+	});
+	
 });
