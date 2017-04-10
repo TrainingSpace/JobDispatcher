@@ -160,77 +160,63 @@ public class JobDispatcherClass {
 
 
     /*
-        Function to return the Job object from JobLibrary list based on the script ID
-        Author: Fernanda Menks, March 2, 2017
-     */
-/*public Job getJob(int pScript_ID){
-        Job tempJob = new Job();
-        for(int i=0; i<iTotalJobIDs; i++){
-            tempJob = JobLibrary.get(i);
-            if (tempJob.Script_ID = pScript_ID){
-               break;
-            }
-        }
-        return tempJob;
-    }
-*/
+      Function to read CSV file from new auto scope and merge it into Job Library
+      Sample:
 
-    /*
-        Function to read CSV file from new auto scope and merge it into Job Library
-        Sample:
+          ****BEFORE****
+          * New Auto Scope CSV:
+             Script ID    Job Name                                    Application     Location    Auto Tool   etc.
+             12                                                       Application_A   ALM         LeanFT
+             14                                                       Application_A   GitHub      Selenium
 
-            ****BEFORE****
-            * New Auto Scope CSV:
-               Script ID    Job Name                                    Application     Location    Auto Tool   etc.
-               12                                                       Application_A   ALM         LeanFT
-               14                                                       Application_A   GitHub      Selenium
-
-            * Job Library CSV:
-               Script ID    Job Name                                    Application     Location    Auto Tool   etc.
-               11           Application_A_Script_11_ALM_UFT             Application_A   ALM         UFT
-               13           Application_A_Script_13_ALM_Worksoft        Application_A   ALM         Worksoft
-               15           Application_A_Script_15_GitHub_Selenium     Application_A   GitHub      Selenium
+          * Job Library CSV:
+             Script ID    Job Name                                    Application     Location    Auto Tool   etc.
+             11           Application_A_Script_11_ALM_UFT             Application_A   ALM         UFT
+             13           Application_A_Script_13_ALM_Worksoft        Application_A   ALM         Worksoft
+             15           Application_A_Script_15_GitHub_Selenium     Application_A   GitHub      Selenium
 
 
 
 
-            ****AFTER****
-            * New Auto Scope CSV: <empty>
-               Script ID    Job Name                        Application     Location    Auto Tool   etc.
+          ****AFTER****
+          * New Auto Scope CSV: <empty>
+             Script ID    Job Name                        Application     Location    Auto Tool   etc.
 
-            * Job Library CSV:
-               Script ID    Job Name                                    Application     Location    Auto Tool   etc.
-               11           Application_A_Script_11_ALM_UFT             Application_A   ALM         UFT
-               13           Application_A_Script_13_ALM_Worksoft        Application_A   ALM         Worksoft
-               15           Application_A_Script_15_GitHub_Selenium     Application_A   GitHub      Selenium
-               12                                                       Application_A   ALM         LeanFT
-               14                                                       Application_A   GitHub      Selenium
+          * Job Library CSV:
+             Script ID    Job Name                                    Application     Location    Auto Tool   etc.
+             11           Application_A_Script_11_ALM_UFT             Application_A   ALM         UFT
+             13           Application_A_Script_13_ALM_Worksoft        Application_A   ALM         Worksoft
+             15           Application_A_Script_15_GitHub_Selenium     Application_A   GitHub      Selenium
+             12                                                       Application_A   ALM         LeanFT
+             14                                                       Application_A   GitHub      Selenium
 
-        Author: Fernanda Menks - Mar 1, 2017
-     */
+      Author: Fernanda Menks - Mar 1, 2017
+   */
     public List<String> Merge_New_Auto_Scope_into_Library(String ApplicationFolder) {
         List<Path> paths = Arrays.asList(Paths.get("./CSVs/"+ApplicationFolder+"/Job_Library.csv"), Paths.get("./CSVs/"+ApplicationFolder+"/New_Auto_Scope.csv"));
         List<String> mergedLines = null;
 
         try {
-            // 1. If the new auto scope file doesn't exist or is empty, we can skip the entire merge activity ----------->>>> PENDING TO IMPLEMENT THIS!
+            //  1. If the new auto scope file doesn't exist or is empty, we can skip the entire merge activity ----------->>>> PENDING TO IMPLEMENT THIS!
+            File csvFile =new File("./CSVs/"+ApplicationFolder+"/New_Auto_Scope.csv");
+            if(csvFile.exists() && csvFile.length()!=0) {
+                // 2. Merge
+                mergedLines = getMergedLines(paths);
+                Path target = Paths.get("./CSVs/" + ApplicationFolder + "/Job_Library.csv");
+                Files.write(target, mergedLines, Charset.forName("UTF-8"));
 
-            // 2. Merge
-            mergedLines = getMergedLines(paths);
-            Path target = Paths.get("./CSVs/"+ApplicationFolder+"/Job_Library.csv");
-            Files.write(target, mergedLines, Charset.forName("UTF-8"));
+                // 3. Clean new auto scope file
+                FileWriter writer = new FileWriter("./CSVs/" + ApplicationFolder + "/New_Auto_Scope.csv", false);
+                writer.write(""); // input empty data
+                writer.close();
 
-            // 3. Clean new auto scope file
-            FileWriter writer = new FileWriter("./CSVs/"+ApplicationFolder+"/New_Auto_Scope.csv", false);
-            writer.write(""); // input empty data
-            writer.close();
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
         return mergedLines;
     }
-
     private static List<String> getMergedLines(List<Path> paths) throws IOException {
         List<String> mergedLines = null;
         try {
