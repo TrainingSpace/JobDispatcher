@@ -192,6 +192,9 @@ public class JobDispatcherClass {
 
       Author: Fernanda Menks - Mar 1, 2017
    */
+
+
+
     public List<String> Merge_New_Auto_Scope_into_Library(String ApplicationFolder) {
         List<Path> paths = Arrays.asList(Paths.get("./CSVs/"+ApplicationFolder+"/Job_Library.csv"), Paths.get("./CSVs/"+ApplicationFolder+"/New_Auto_Scope.csv"));
         List<String> mergedLines = null;
