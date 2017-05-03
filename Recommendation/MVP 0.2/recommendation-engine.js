@@ -8,7 +8,7 @@ $(document).ready(function(){
 	$('#execContainer').hide();
 	$('#defectsContainer').hide();
 	$('#exportScriptsIdData').hide();
-	$('#answersContainer').hide();
+	//removed to show datepicker $('#answersContainer').hide();
 	$('#finalanswers').hide();
 	$('#calculate').hide();	
 	
@@ -18,8 +18,25 @@ $(document).ready(function(){
 	var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
 
 	var currentDate = new Date();		
-	var currentMonth = monthNames[currentDate.getMonth()];
-	var currentYear = currentDate.getFullYear();
+	var currentMonth; //= 3 //TEST for req q1 alert
+	var currentYear; //= currentDate.getFullYear();
+
+	//Datepicker function
+	$( function() {
+        $("#datepicker").datepicker({
+        		   dateFormat: 'mm-dd-yy',
+        		   inline: true,
+                   onSelect: function() {
+                      var cutDate = $(this).datepicker( 'getDate' );
+                      var cutDay = cutDate.getDate();
+                      var cutDateMonth = cutDate.getMonth() + 1;
+                      var cutDateYear = cutDate.getFullYear();
+                      alert(cutDateMonth + '-' + cutDay + '-' + cutDateYear);
+                      currentMonth = cutDateMonth;
+                      currentYear = cutDateYear;
+                   }
+         });
+    });
 	
 	var orgReqFile = []; //original requirement csv file
 	var orgScriptsCsvFile = []; //original scripts csv file
@@ -69,7 +86,7 @@ $(document).ready(function(){
 		$('#execContainer').hide();
 		$('#defectsContainer').hide();
 		$('#exportScriptsIdData').hide();
-		$('#answersContainer').hide();
+		//Dont Hide Cut Date field $('#answersContainer').hide();
 		//alert('question selected === ' + $("#questions option:selected").text() );
 		q1CurrentMonthReqIds = [];
 		q1CurrentMonthScriptIds = '';
@@ -173,7 +190,7 @@ $(document).ready(function(){
 				
 				var reqsCreationDate = new Date(orgReqsdata[2]);
 				locale = "en-us",
-				reqsCreationMonth = reqsCreationDate.toLocaleString(locale, { month: "long" });	
+				reqsCreationMonth = reqsCreationDate.getMonth() + 1; //changed month to a number to be compatible with datepicker
 				reqsCreationYear = reqsCreationDate.getFullYear();
 				
 				if (reqsCreationYear == currentYear) {
@@ -433,11 +450,7 @@ $(document).ready(function(){
 		}						
 	}
 	
-	$( function() {
-		$( "#datepicker" ).datepicker();
-	});
-	
-			
+
 	$(".downloadJobListData").on('click', function(event) {
 		if (questionsVal == ''){
 			alert('Please select an option from the questions dropdown');
